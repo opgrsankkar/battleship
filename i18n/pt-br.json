@@ -21,7 +21,7 @@
     "hard": "Difícil",
     "difficultyHint": "Fácil: tiros aleatórios | Médio: caça e alvo | Difícil: baseado em probabilidade",
     "placeShips": "Posicione seus Navios",
-    "placeShipsHint": "Selecione um navio da lista e clique na grade para posicioná-lo. Use Girar (R) para mudar a orientação. Posicione todos os navios e clique em Pronto!",
+    "placeShipsHint": "Selecione um navio da lista e clique na grade para posicioná-lo. Pressione R ou toque duas vezes em um navio selecionado para girá-lo. Posicione todos os navios e clique em Pronto!",
     "rotate": "Girar (R)",
     "random": "Aleatório",
     "ready": "Pronto!",

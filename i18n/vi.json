@@ -21,7 +21,7 @@
     "hard": "Khó",
     "difficultyHint": "Dễ: bắn ngẫu nhiên | Trung bình: săn & mục tiêu | Khó: dựa trên xác suất",
     "placeShips": "Sắp xếp tàu",
-    "placeShipsHint": "Chọn một tàu từ danh sách, sau đó nhấp vào lưới để đặt. Dùng Xoay (R) để đổi hướng. Đặt tất cả tàu, sau đó nhấn Sẵn sàng!",
+    "placeShipsHint": "Chọn một tàu từ danh sách, sau đó nhấp vào lưới để đặt. Nhấn R hoặc chạm đúp vào tàu đã chọn để xoay. Đặt tất cả tàu, sau đó nhấn Sẵn sàng!",
     "rotate": "Xoay (R)",
     "random": "Ngẫu nhiên",
     "ready": "Sẵn sàng!",

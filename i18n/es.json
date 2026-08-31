@@ -21,7 +21,7 @@
     "hard": "Difícil",
     "difficultyHint": "Fácil: disparos aleatorios | Medio: busca y ataca | Difícil: basado en probabilidad",
     "placeShips": "Coloca tus Barcos",
-    "placeShipsHint": "Selecciona un barco de la lista y haz clic en la cuadrícula para colocarlo. Usa Rotar (R) para cambiar la orientación. ¡Coloca todos los barcos y pulsa Listo!",
+    "placeShipsHint": "Selecciona un barco de la lista y haz clic en la cuadrícula para colocarlo. Pulsa R o toca dos veces un barco seleccionado para girarlo. ¡Coloca todos los barcos y pulsa Listo!",
     "rotate": "Rotar (R)",
     "random": "Aleatorio",
     "ready": "¡Listo!",

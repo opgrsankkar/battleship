@@ -96,9 +96,13 @@ h3 { font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: upp
 .ship-item {
   display: flex; align-items: center; gap: 8px; padding: 10px 14px;
   background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
-  cursor: pointer; transition: all 0.15s;
+  cursor: pointer; transition: all 0.15s; touch-action: manipulation;
 }
 .ship-item.selected { border-color: var(--accent); background: var(--surface2); }
+.ship-item.selected::after {
+  content: attr(data-orientation); margin-left: auto; color: var(--accent);
+  font-size: 20px; font-weight: 700; line-height: 1;
+}
 .ship-item.placed { opacity: 0.4; cursor: default; }
 .ship-item .ship-name { font-size: 13px; font-weight: 600; color: var(--text); }
 .ship-item .ship-len { font-size: 11px; color: var(--text-dim); }
