@@ -127,7 +127,7 @@ for (const loc of LOCALES.filter((l) => l !== 'en')) {
   // <strong>Ready!</strong> whose anchors would otherwise be rewritten by the
   // label loop below, breaking these regex end-anchors.
   html = html.replace(/Easy: random shots[\s\S]*?Hard: probability-based/, esc(t.ui.difficultyHint));
-  html = html.replace(/Select a ship from the list[\s\S]*?Ready!<\/strong>/, esc(t.ui.placeShipsHint));
+  html = html.replace(/(?:Select a ship from the list|Drag ships onto the grid)[\s\S]*?Ready!<\/strong>/, esc(t.ui.placeShipsHint));
   // logo + UI text labels (anchored as element text)
   const textKeys = ['vsComputer','multiplayer','createRoom','join','back','copyCode','copyLink','difficulty','easy','medium','hard','placeShips','rotate','random','ready','yourFleet','enemyWaters','you','opponent','playAgain','mainMenu','leaderboard'];
   for (const k of textKeys) html = litReplace(html, `>${en.ui[k]}<`, `>${t.ui[k]}<`, `ui.${k}`);

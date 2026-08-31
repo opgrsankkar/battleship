@@ -27,7 +27,7 @@
     "hard": "Hard",
     "difficultyHint": "Easy: random shots | Medium: hunt & target | Hard: probability-based",
     "placeShips": "Place Your Ships",
-    "placeShipsHint": "Select a ship from the list, then click the grid to place it. Press R or double-tap a selected ship to rotate it. Place all ships, then hit Ready!",
+    "placeShipsHint": "Drag ships onto the grid, or click to place them. Drag a placed ship to move it. Press R or double-tap a selected ship to rotate it, then hit Ready!",
     "rotate": "Rotate (R)",
     "random": "Random",
     "ready": "Ready!",
