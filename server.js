@@ -87,10 +87,34 @@ function createGameServer(options = {}) {
   const rooms = {};
 
   app.use(express.static(path.join(__dirname, 'public')));
+  app.get('/api/config', (_req, res) => {
+    res.json({ autoLobby });
+  });
   app.get('/api/leaderboard', async (_req, res) => {
     const players = await db.getLeaderboard(20);
     res.json({ game: db.GAME, players });
   });
+
+  function leaveAutoLobby(socket) {
+    const room = rooms[AUTO_ROOM_CODE];
+    if (!room?.players.includes(socket.id)) return false;
+    room.players = room.players.filter(id => id !== socket.id);
+    delete room.names[socket.id];
+    resetMatch(room);
+    socket.leave(AUTO_ROOM_CODE);
+    socket.data.roomCode = null;
+    io.to(AUTO_ROOM_CODE).emit('opponent_disconnected');
+    if (!room.players.length) {
+      delete rooms[AUTO_ROOM_CODE];
+    } else {
+      io.to(room.players[0]).emit('auto_lobby_assigned', {
+        playerNumber: 1,
+        waiting: true,
+        code: AUTO_ROOM_CODE,
+      });
+    }
+    return true;
+  }
 
   io.on('connection', (socket) => {
     socket.on('auto_lobby_join', (payload = {}) => {
@@ -116,6 +140,10 @@ function createGameServer(options = {}) {
         code: AUTO_ROOM_CODE,
       });
       if (room.players.length === 2) io.to(AUTO_ROOM_CODE).emit('opponent_joined');
+    });
+
+    socket.on('auto_lobby_leave', () => {
+      leaveAutoLobby(socket);
     });
 
     socket.on('create_room', (payload = {}) => {
@@ -202,20 +230,7 @@ function createGameServer(options = {}) {
         delete rooms[code];
         return;
       }
-
-      room.players = room.players.filter(id => id !== socket.id);
-      delete room.names[socket.id];
-      resetMatch(room);
-      io.to(code).emit('opponent_disconnected');
-      if (!room.players.length) {
-        delete rooms[code];
-      } else {
-        io.to(room.players[0]).emit('auto_lobby_assigned', {
-          playerNumber: 1,
-          waiting: true,
-          code: AUTO_ROOM_CODE,
-        });
-      }
+      leaveAutoLobby(socket);
     });
   });
 

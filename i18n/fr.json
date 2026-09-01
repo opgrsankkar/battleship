@@ -32,7 +32,10 @@
     "opponent": "ADVERSAIRE",
     "playAgain": "Rejouer",
     "mainMenu": "Menu principal",
-    "leaderboard": "🏆 Classement"
+    "leaderboard": "🏆 Classement",
+    "localLobby": "Salon local",
+    "playPrivateAI": "Jouer contre l'ordinateur",
+    "retryLobby": "Réessayer le salon"
   },
   "seo": {
     "h2": "Jouez à la Bataille Navale en ligne — Gratuit, sans téléchargement",
@@ -108,7 +111,13 @@
     "youHit": "Touché en {cell}",
     "youMissed": "Manqué en {cell}",
     "oppHit": "L'adversaire a touché {cell}",
-    "oppMissed": "L'adversaire a manqué {cell}"
+    "oppMissed": "L'adversaire a manqué {cell}",
+    "autoConnecting": "Connexion au salon local…",
+    "autoAssigned": "Vous êtes le joueur {player}.",
+    "autoWaiting": "En attente du joueur 2…",
+    "autoFullBadge": "Salon complet",
+    "autoFull": "Le salon local est complet. Vous pouvez lancer une partie privée contre l'ordinateur.",
+    "autoOpponentLeft": "Votre adversaire est parti. En attente d'un autre joueur…"
   },
   "_meta": {
     "site": "battleship",

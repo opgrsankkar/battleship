@@ -8,6 +8,7 @@ services:
     environment:
       - PORT=3025
       - GAME_ID=battleship
+      - AUTO_LOBBY=true
       - DATABASE_URL=postgresql://games:g4m3sDB_2024xQ!@games-db:5432/games
     networks:
       - default

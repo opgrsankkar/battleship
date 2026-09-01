@@ -32,7 +32,10 @@
     "opponent": "ĐỐI THỦ",
     "playAgain": "Chơi lại",
     "mainMenu": "Menu chính",
-    "leaderboard": "🏆 Bảng xếp hạng"
+    "leaderboard": "🏆 Bảng xếp hạng",
+    "localLobby": "Phòng cục bộ",
+    "playPrivateAI": "Đấu với máy",
+    "retryLobby": "Thử lại phòng chờ"
   },
   "seo": {
     "h2": "Chơi Hải chiến Online — Miễn phí, không cần tải về",
@@ -108,7 +111,13 @@
     "youHit": "Bạn bắn trúng {cell}",
     "youMissed": "Bạn bắn trượt {cell}",
     "oppHit": "Đối thủ bắn trúng {cell}",
-    "oppMissed": "Đối thủ bắn trượt {cell}"
+    "oppMissed": "Đối thủ bắn trượt {cell}",
+    "autoConnecting": "Đang tham gia phòng cục bộ…",
+    "autoAssigned": "Bạn là Người chơi {player}.",
+    "autoWaiting": "Đang chờ Người chơi 2…",
+    "autoFullBadge": "Phòng đã đầy",
+    "autoFull": "Phòng cục bộ đã đầy. Bạn có thể bắt đầu một ván riêng với máy.",
+    "autoOpponentLeft": "Đối thủ đã rời đi. Đang chờ người chơi khác…"
   },
   "_meta": {
     "site": "battleship",

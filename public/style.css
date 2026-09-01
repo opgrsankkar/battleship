@@ -82,11 +82,27 @@ h3 { font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: upp
   letter-spacing: 6px; color: var(--accent); display: flex; align-items: center; gap: 12px;
 }
 .room-code.hidden { display: none; }
+.hidden { display: none !important; }
 .btn-copy {
   background: transparent; border: 1px solid var(--accent); color: var(--accent);
   padding: 4px 10px; border-radius: 3px; cursor: pointer; font-size: 12px; letter-spacing: 1px;
 }
 .btn-copy:hover { background: var(--accent); color: #000; }
+
+.auto-lobby-card {
+  width: min(440px, calc(100% - 24px)); padding: 28px;
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  text-align: center;
+}
+.auto-player-badge {
+  padding: 8px 16px; border-radius: 999px; background: var(--surface2);
+  color: var(--accent); font-size: 14px; font-weight: 800; letter-spacing: 2px;
+  text-transform: uppercase;
+}
+#auto-lobby-status { min-height: 24px; color: var(--text); line-height: 1.5; }
+.auto-lobby-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.auto-lobby-actions .btn { width: auto; }
 
 .hint { font-size: 12px; color: var(--text-dim); margin-top: 16px; text-align: center; }
 

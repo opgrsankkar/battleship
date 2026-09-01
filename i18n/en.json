@@ -38,7 +38,10 @@
     "opponent": "OPPONENT",
     "playAgain": "Play Again",
     "mainMenu": "Main Menu",
-    "leaderboard": "🏆 Leaderboard"
+    "leaderboard": "🏆 Leaderboard",
+    "localLobby": "Local Lobby",
+    "playPrivateAI": "Play vs Computer",
+    "retryLobby": "Retry Lobby"
   },
   "seo": {
     "h2": "Play Battleship Online — Free, No Download",
@@ -93,6 +96,12 @@
     "youHit": "You hit {cell}",
     "youMissed": "You missed {cell}",
     "oppHit": "Opponent hit {cell}",
-    "oppMissed": "Opponent missed {cell}"
+    "oppMissed": "Opponent missed {cell}",
+    "autoConnecting": "Joining the local lobby…",
+    "autoAssigned": "You are Player {player}.",
+    "autoWaiting": "Waiting for Player 2…",
+    "autoFullBadge": "Lobby Full",
+    "autoFull": "The local lobby is full. You can start a private AI game.",
+    "autoOpponentLeft": "Your opponent left. Waiting for another player…"
   }
 }

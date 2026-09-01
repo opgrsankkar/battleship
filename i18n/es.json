@@ -32,7 +32,10 @@
     "opponent": "OPONENTE",
     "playAgain": "Jugar de Nuevo",
     "mainMenu": "Menú Principal",
-    "leaderboard": "🏆 Clasificación"
+    "leaderboard": "🏆 Clasificación",
+    "localLobby": "Sala local",
+    "playPrivateAI": "Jugar contra la computadora",
+    "retryLobby": "Reintentar sala"
   },
   "seo": {
     "h2": "Juega a la Batalla Naval Online — Gratis, Sin Descargas",
@@ -108,7 +111,13 @@
     "youHit": "Acertaste en {cell}",
     "youMissed": "Fallaste en {cell}",
     "oppHit": "El oponente acertó en {cell}",
-    "oppMissed": "El oponente falló en {cell}"
+    "oppMissed": "El oponente falló en {cell}",
+    "autoConnecting": "Entrando en la sala local…",
+    "autoAssigned": "Eres el jugador {player}.",
+    "autoWaiting": "Esperando al jugador 2…",
+    "autoFullBadge": "Sala llena",
+    "autoFull": "La sala local está llena. Puedes iniciar una partida privada contra la computadora.",
+    "autoOpponentLeft": "Tu oponente se fue. Esperando a otro jugador…"
   },
   "_meta": {
     "site": "battleship",
