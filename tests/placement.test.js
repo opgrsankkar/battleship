@@ -62,3 +62,33 @@ test('findShip rejects malformed non-contiguous ship data', () => {
   board[1][3] = 2;
   assert.equal(Placement.findShip(board, 2), null);
 });
+
+test('findNearestPlacement keeps a directly valid rotation in place', () => {
+  const board = emptyBoard();
+  const preferred = { row: 4, col: 4, size: 3, horizontal: false };
+  assert.deepEqual(Placement.findNearestPlacement(board, 3, preferred), preferred);
+});
+
+test('findNearestPlacement chooses the nearest deterministic free origin', () => {
+  const board = emptyBoard();
+  Placement.placeShip(board, 5, { row: 5, col: 1, size: 2, horizontal: true });
+  const preferred = { row: 5, col: 0, size: 5, horizontal: true };
+  assert.deepEqual(Placement.findNearestPlacement(board, 1, preferred), {
+    row: 4, col: 0, size: 5, horizontal: true,
+  });
+});
+
+test('findNearestPlacement moves an edge rotation the minimum distance', () => {
+  const board = emptyBoard();
+  const preferred = { row: 6, col: 9, size: 5, horizontal: true };
+  assert.deepEqual(Placement.findNearestPlacement(board, 1, preferred), {
+    row: 6, col: 5, size: 5, horizontal: true,
+  });
+});
+
+test('findNearestPlacement returns null when no placement is available', () => {
+  const board = Array.from({ length: 2 }, () => Array(2).fill(9));
+  assert.equal(Placement.findNearestPlacement(board, 1, {
+    row: 0, col: 0, size: 2, horizontal: true,
+  }), null);
+});

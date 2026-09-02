@@ -84,6 +84,26 @@
     return true;
   }
 
+  function findNearestPlacement(board, shipId, preferred) {
+    if (!preferred) return null;
+    if (canPlace(board, shipId, preferred)) return { ...preferred };
+
+    let best = null;
+    for (let row = 0; row < board.length; row++) {
+      for (let col = 0; col < board[row].length; col++) {
+        const candidate = { ...preferred, row, col };
+        if (!canPlace(board, shipId, candidate)) continue;
+        const distance = Math.abs(row - preferred.row) + Math.abs(col - preferred.col);
+        if (!best || distance < best.distance
+          || (distance === best.distance && row < best.placement.row)
+          || (distance === best.distance && row === best.placement.row && col < best.placement.col)) {
+          best = { distance, placement: candidate };
+        }
+      }
+    }
+    return best?.placement || null;
+  }
+
   return {
     DEFAULT_BOARD_SIZE,
     cellsFor,
@@ -92,5 +112,6 @@
     findShip,
     clearShip,
     placeShip,
+    findNearestPlacement,
   };
 }));

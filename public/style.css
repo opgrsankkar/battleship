@@ -104,6 +104,7 @@ h3 { font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: upp
   font-size: 20px; font-weight: 700; line-height: 1;
 }
 .ship-item.placed { opacity: 0.4; cursor: default; }
+.ship-item.placed.selected { opacity: 1; cursor: grab; }
 .ship-item .ship-name { font-size: 13px; font-weight: 600; color: var(--text); }
 .ship-item .ship-len { font-size: 11px; color: var(--text-dim); }
 .ship-blocks { display: flex; gap: 2px; }
@@ -138,6 +139,7 @@ h3 { font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: upp
 .cell.ship { background: var(--ship); }
 #place-board { touch-action: none; }
 #place-board .cell.ship { cursor: grab; }
+#place-board .cell.ship-selected { box-shadow: inset 0 0 0 2px var(--accent); }
 body.placing-drag, body.placing-drag * { cursor: grabbing !important; user-select: none; }
 .cell.ship-preview { background: rgba(0,212,255,0.25); }
 .cell.ship-invalid { background: rgba(255,68,68,0.25); }
