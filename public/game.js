@@ -26,6 +26,7 @@ let state = {
 
   // placement
   placedShips: new Set(),
+  shipPlacements: {},
   selectedShip: null,
   horizontal: true,
   hoverCell: null,
@@ -199,6 +200,7 @@ socket.on('opponent_disconnected', () => {
 function initPlacement() {
   state.myBoard = Array.from({ length: 10 }, () => Array(10).fill(0));
   state.placedShips = new Set();
+  state.shipPlacements = {};
   state.selectedShip = null;
   state.horizontal = true;
   lastShipTap = { shipId: null, at: 0 };
@@ -301,14 +303,14 @@ function clearPreview() {
 function onPlaceCellClick(r, c) {
   if (!state.selectedShip) return;
   const ship = state.selectedShip;
-  const cells = getShipCells(r, c, ship.size, state.horizontal);
-  if (!cells) return;
-  if (!cells.every(([rr, cc]) => state.myBoard[rr][cc] === 0)) return;
+  const placement = { row: r, col: c, size: ship.size, horizontal: state.horizontal };
+  if (!Placement.placeShip(state.myBoard, ship.id, placement)) return;
+  const cells = Placement.cellsForPlacement(placement);
 
   cells.forEach(([rr, cc]) => {
-    state.myBoard[rr][cc] = ship.id;
     getCell('place-board', rr, cc).classList.add('ship');
   });
+  state.shipPlacements[ship.id] = placement;
   clearPreview();
 
   state.placedShips.add(ship.id);
@@ -322,28 +324,22 @@ function onPlaceCellClick(r, c) {
 }
 
 function getShipCells(r, c, size, horiz) {
-  const cells = [];
-  for (let i = 0; i < size; i++) {
-    const rr = horiz ? r : r + i;
-    const cc = horiz ? c + i : c;
-    if (rr >= 10 || cc >= 10) return null;
-    cells.push([rr, cc]);
-  }
-  return cells;
+  return Placement.cellsFor(r, c, size, horiz);
 }
 
 function randomPlacement() {
   state.myBoard = Array.from({ length: 10 }, () => Array(10).fill(0));
   state.placedShips = new Set();
+  state.shipPlacements = {};
   SHIPS.forEach(ship => {
     let placed = false;
     while (!placed) {
       const horiz = Math.random() < 0.5;
       const r = Math.floor(Math.random() * 10);
       const c = Math.floor(Math.random() * 10);
-      const cells = getShipCells(r, c, ship.size, horiz);
-      if (cells && cells.every(([rr, cc]) => state.myBoard[rr][cc] === 0)) {
-        cells.forEach(([rr, cc]) => { state.myBoard[rr][cc] = ship.id; });
+      const placement = { row: r, col: c, size: ship.size, horizontal: horiz };
+      if (Placement.placeShip(state.myBoard, ship.id, placement)) {
+        state.shipPlacements[ship.id] = placement;
         state.placedShips.add(ship.id);
         placed = true;
       }

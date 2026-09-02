@@ -4,6 +4,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "test": "node --test tests/*.test.js",
     "i18n:translate": "node scripts/i18n-translate.mjs",
     "i18n:build": "node scripts/i18n-build.mjs"
   },

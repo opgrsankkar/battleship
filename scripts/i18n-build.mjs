@@ -147,6 +147,7 @@ for (const loc of LOCALES.filter((l) => l !== 'en')) {
   // subdirectory: make relative asset paths absolute so /<loc>/ resolves them
   html = html.replace(/href="style\.css"/g, 'href="/style.css"')
              .replace(/src="name\.js"/g, 'src="/name.js"')
+             .replace(/src="placement\.js"/g, 'src="/placement.js"')
              .replace(/src="game\.js"/g, 'src="/game.js"');
 
   html = injectRuntime(injectHead(html, loc), t.runtime);
