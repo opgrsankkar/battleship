@@ -140,6 +140,19 @@
     </div>
   </div>
 
+  <!-- Automatic local lobby -->
+  <div id="screen-auto-lobby" class="screen">
+    <h2>Lokale Lobby</h2>
+    <div class="auto-lobby-card">
+      <div class="auto-player-badge" id="auto-player-badge">Connecting…</div>
+      <p id="auto-lobby-status">Joining the local lobby…</p>
+      <div id="auto-overflow-actions" class="auto-lobby-actions hidden">
+        <button class="btn btn-primary" onclick="startOverflowAI()">Gegen Computer spielen</button>
+        <button class="btn btn-ghost" onclick="retryAutoLobby()">Lobby erneut versuchen</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Multiplayer Menu -->
   <div id="screen-mp-menu" class="screen">
     <h2>Mehrspieler</h2>
@@ -231,7 +244,7 @@
       </div>
       <div class="result-actions">
         <button class="btn btn-primary" onclick="playAgain()">Nochmal spielen</button>
-        <button class="btn btn-ghost" onclick="hideResult(); showScreen('screen-menu')">Hauptmenü</button>
+        <button class="btn btn-ghost" onclick="leaveGameToMenu()">Hauptmenü</button>
       </div>
     </section>
     <div class="game-boards">
@@ -316,7 +329,7 @@
   <script src="/placement.js"></script>
   <!-- i18n:runtime:start -->
 <script>
-window.__I18N__ = {"ships":{"1":"Flugzeugträger","2":"Schlachtschiff","3":"Kreuzer","4":"U-Boot","5":"Zerstörer"},"yourTurn":"Du bist dran","oppTurn":"Gegner ist dran","victory":"SIEG!","defeat":"NIEDERLAGE","wonSub":"Du hast alle feindlichen Schiffe versenkt!","lostSub":"Deine Flotte wurde zerstört.","copied":"Kopiert!","copyCode":"Code kopieren","copyLink":"Link kopieren","joiningRoom":"Trete Raum {code} bei…","waitingJoin":"Warte auf Beitritt des Gegners…","oppReady":"Gegner ist bereit!","oppDisconnected":"Gegner hat die Verbindung getrennt.","youSunkTheir":"Du hast ihr {ship} versenkt!","theySunkYour":"Sie haben dein {ship} versenkt!","youHit":"Treffer auf {cell}","youMissed":"Fehlschuss auf {cell}","oppHit":"Gegner trifft {cell}","oppMissed":"Gegner verfehlt {cell}"};
+window.__I18N__ = {"ships":{"1":"Flugzeugträger","2":"Schlachtschiff","3":"Kreuzer","4":"U-Boot","5":"Zerstörer"},"yourTurn":"Du bist dran","oppTurn":"Gegner ist dran","victory":"SIEG!","defeat":"NIEDERLAGE","wonSub":"Du hast alle feindlichen Schiffe versenkt!","lostSub":"Deine Flotte wurde zerstört.","copied":"Kopiert!","copyCode":"Code kopieren","copyLink":"Link kopieren","joiningRoom":"Trete Raum {code} bei…","waitingJoin":"Warte auf Beitritt des Gegners…","oppReady":"Gegner ist bereit!","oppDisconnected":"Gegner hat die Verbindung getrennt.","youSunkTheir":"Du hast ihr {ship} versenkt!","theySunkYour":"Sie haben dein {ship} versenkt!","youHit":"Treffer auf {cell}","youMissed":"Fehlschuss auf {cell}","oppHit":"Gegner trifft {cell}","oppMissed":"Gegner verfehlt {cell}","autoConnecting":"Lokale Lobby wird betreten…","autoAssigned":"Du bist Spieler {player}.","autoWaiting":"Warte auf Spieler 2…","autoFullBadge":"Lobby voll","autoFull":"Die lokale Lobby ist voll. Du kannst ein privates Spiel gegen den Computer starten.","autoOpponentLeft":"Dein Gegner hat die Lobby verlassen. Warte auf einen neuen Spieler…"};
 window.t = function(k, p){ var d = window.__I18N__ || {}; var s = String(k).split('.').reduce(function(o,i){return (o==null)?undefined:o[i];}, d); if (s == null) s = k; if (p) for (var n in p) s = s.split('{'+n+'}').join(p[n]); return s; };
 </script>
 <!-- i18n:runtime:end -->

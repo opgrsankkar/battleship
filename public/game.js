@@ -19,6 +19,8 @@ let state = {
   mode: null,          // 'single' | 'multi'
   difficulty: 'medium',
   roomCode: null,
+  autoLobby: false,
+  playerNumber: null,
   myBoard: null,       // 10x10, cell = 0|shipId
   oppHits: null,       // 10x10 bool — cells I've attacked on opp board
   myHits: null,        // 10x10 bool — cells opp has attacked on my board
@@ -77,6 +79,8 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('room-input').value = room.toUpperCase();
     document.getElementById('mp-status').textContent = T('joiningRoom', { code: room.toUpperCase() });
     socket.emit('join_room', { code: room.toUpperCase(), name: currentName() });
+  } else {
+    loadClientConfig();
   }
 });
 
@@ -101,6 +105,33 @@ async function loadLeaderboard() {
       `<tr class="${me && p.player === me ? 'lb-me' : ''}"><td>${i + 1}</td><td>${esc(p.player)}</td><td>${p.wins}</td><td>${p.losses}</td><td>${p.draws}</td></tr>`
     ).join('');
   } catch { body.innerHTML = '<tr><td colspan="5">Leaderboard unavailable.</td></tr>'; }
+}
+
+async function loadClientConfig() {
+  try {
+    const response = await fetch('/api/config');
+    const config = await response.json();
+    if (config.autoLobby) retryAutoLobby();
+  } catch {
+    // Static deployments and older servers keep the normal menu.
+  }
+}
+
+function retryAutoLobby() {
+  state.autoLobby = true;
+  state.mode = 'multi';
+  state.roomCode = 'AUTO';
+  document.getElementById('auto-player-badge').textContent = T('autoConnecting');
+  document.getElementById('auto-lobby-status').textContent = T('autoConnecting');
+  document.getElementById('auto-overflow-actions').classList.add('hidden');
+  showScreen('screen-auto-lobby');
+  socket.emit('auto_lobby_join', { name: currentName() });
+}
+
+function startOverflowAI() {
+  state.autoLobby = false;
+  state.playerNumber = null;
+  startSinglePlayer();
 }
 
 // ── Menu actions ──────────────────────────────────────────────────────────────
@@ -133,7 +164,35 @@ function copyCode() {
 }
 
 // ── Socket events ─────────────────────────────────────────────────────────────
+socket.on('auto_lobby_assigned', ({ playerNumber, waiting, code }) => {
+  state.autoLobby = true;
+  state.mode = 'multi';
+  state.roomCode = code;
+  state.playerNumber = playerNumber;
+  document.getElementById('auto-player-badge').textContent = T('autoAssigned', { player: playerNumber });
+  document.getElementById('auto-lobby-status').textContent = waiting ? T('autoWaiting') : T('oppReady');
+  document.getElementById('auto-overflow-actions').classList.add('hidden');
+  showScreen('screen-auto-lobby');
+});
+
+socket.on('lobby_full', () => {
+  state.autoLobby = false;
+  state.mode = null;
+  state.roomCode = null;
+  state.playerNumber = null;
+  document.getElementById('auto-player-badge').textContent = T('autoFullBadge');
+  document.getElementById('auto-lobby-status').textContent = T('autoFull');
+  document.getElementById('auto-overflow-actions').classList.remove('hidden');
+  showScreen('screen-auto-lobby');
+});
+
+socket.on('auto_lobby_unavailable', () => {
+  state.autoLobby = false;
+  showScreen('screen-menu');
+});
+
 socket.on('room_created', ({ code }) => {
+  state.autoLobby = false;
   state.roomCode = code;
   state.mode = 'multi';
   document.getElementById('room-code-text').textContent = code;
@@ -147,6 +206,7 @@ socket.on('join_error', (msg) => {
 });
 
 socket.on('room_joined', ({ code }) => {
+  state.autoLobby = false;
   state.roomCode = code;
   state.mode = 'multi';
   initPlacement();
@@ -195,8 +255,13 @@ socket.on('attack_result', ({ attacker, row, col, hit, sunkShip, won, nextTurn }
 });
 
 socket.on('opponent_disconnected', () => {
-  if (!state.gameOver) alert(T('oppDisconnected'));
-  showScreen('screen-menu');
+  if (state.autoLobby) {
+    document.getElementById('auto-lobby-status').textContent = T('autoOpponentLeft');
+    showScreen('screen-auto-lobby');
+  } else {
+    if (!state.gameOver) alert(T('oppDisconnected'));
+    showScreen('screen-menu');
+  }
 });
 
 // ── Placement ─────────────────────────────────────────────────────────────────
@@ -838,9 +903,22 @@ function playAgain() {
   if (state.mode === 'single') {
     initPlacement();
     showScreen('screen-difficulty');
+  } else if (state.autoLobby) {
+    initPlacement();
+    showScreen('screen-placement');
   } else {
     showScreen('screen-menu');
   }
+}
+
+function leaveGameToMenu() {
+  hideResult();
+  if (state.autoLobby) socket.emit('auto_lobby_leave');
+  state.autoLobby = false;
+  state.playerNumber = null;
+  state.roomCode = null;
+  state.mode = null;
+  showScreen('screen-menu');
 }
 
 // ── Log ───────────────────────────────────────────────────────────────────────

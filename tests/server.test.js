@@ -68,6 +68,7 @@ test('automatic lobby assigns two seats, rejects overflow, and promotes the rema
   const clients = [];
 
   try {
+    assert.deepEqual(await fetch(`${url}/api/config`).then(response => response.json()), { autoLobby: true });
     const player1 = await connect(url);
     clients.push(player1);
     const assignment1 = waitFor(player1, 'auto_lobby_assigned');
@@ -92,11 +93,23 @@ test('automatic lobby assigns two seats, rejects overflow, and promotes the rema
     player1.emit('ships_placed', { code: 'AUTO', board: Array.from({ length: 10 }, () => Array(10).fill(0)) });
     assert.equal(await placementError, 'Invalid fleet placement');
 
+    const left = waitFor(player1, 'opponent_disconnected');
+    const reassignedAfterLeave = waitFor(player1, 'auto_lobby_assigned');
+    player2.emit('auto_lobby_leave');
+    await left;
+    assert.deepEqual(await reassignedAfterLeave, { playerNumber: 1, waiting: true, code: 'AUTO' });
+
+    const replacement = await connect(url);
+    clients.push(replacement);
+    const replacementAssignment = waitFor(replacement, 'auto_lobby_assigned');
+    replacement.emit('auto_lobby_join', { name: 'Four' });
+    assert.deepEqual(await replacementAssignment, { playerNumber: 2, waiting: false, code: 'AUTO' });
+
     const disconnected = waitFor(player1, 'opponent_disconnected');
-    const reassigned = waitFor(player1, 'auto_lobby_assigned');
-    player2.disconnect();
+    const reassignedAfterDisconnect = waitFor(player1, 'auto_lobby_assigned');
+    replacement.disconnect();
     await disconnected;
-    assert.deepEqual(await reassigned, { playerNumber: 1, waiting: true, code: 'AUTO' });
+    assert.deepEqual(await reassignedAfterDisconnect, { playerNumber: 1, waiting: true, code: 'AUTO' });
   } finally {
     clients.forEach(client => client.disconnect());
     await new Promise(resolve => game.io.close(resolve));
@@ -109,6 +122,10 @@ test('automatic lobby protocol is disabled unless configured', { timeout: 5000 }
   const address = game.server.address();
   const client = await connect(`http://127.0.0.1:${address.port}`);
   try {
+    assert.deepEqual(
+      await fetch(`http://127.0.0.1:${address.port}/api/config`).then(response => response.json()),
+      { autoLobby: false },
+    );
     const unavailable = waitFor(client, 'auto_lobby_unavailable');
     client.emit('auto_lobby_join', { name: 'One' });
     await unavailable;

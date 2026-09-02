@@ -32,7 +32,10 @@
     "opponent": "GEGNER",
     "playAgain": "Nochmal spielen",
     "mainMenu": "Hauptmenü",
-    "leaderboard": "🏆 Bestenliste"
+    "leaderboard": "🏆 Bestenliste",
+    "localLobby": "Lokale Lobby",
+    "playPrivateAI": "Gegen Computer spielen",
+    "retryLobby": "Lobby erneut versuchen"
   },
   "seo": {
     "h2": "Schiffe versenken online spielen — Kostenlos, ohne Download",
@@ -108,7 +111,13 @@
     "youHit": "Treffer auf {cell}",
     "youMissed": "Fehlschuss auf {cell}",
     "oppHit": "Gegner trifft {cell}",
-    "oppMissed": "Gegner verfehlt {cell}"
+    "oppMissed": "Gegner verfehlt {cell}",
+    "autoConnecting": "Lokale Lobby wird betreten…",
+    "autoAssigned": "Du bist Spieler {player}.",
+    "autoWaiting": "Warte auf Spieler 2…",
+    "autoFullBadge": "Lobby voll",
+    "autoFull": "Die lokale Lobby ist voll. Du kannst ein privates Spiel gegen den Computer starten.",
+    "autoOpponentLeft": "Dein Gegner hat die Lobby verlassen. Warte auf einen neuen Spieler…"
   },
   "_meta": {
     "site": "battleship",
