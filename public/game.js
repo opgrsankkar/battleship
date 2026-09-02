@@ -30,6 +30,7 @@ let state = {
   selectedShip: null,
   horizontal: true,
   hoverCell: null,
+  dragPlacement: null,
 
   // AI
   aiBoard: null,
@@ -203,6 +204,7 @@ function initPlacement() {
   state.shipPlacements = {};
   state.selectedShip = null;
   state.horizontal = true;
+  state.dragPlacement = null;
   lastShipTap = { shipId: null, at: 0 };
 
   buildShipList();
@@ -221,6 +223,7 @@ function buildShipList() {
     el.className = 'ship-item';
     el.id = `ship-item-${ship.id}`;
     el.onclick = () => selectShip(ship.id);
+    el.addEventListener('pointerdown', e => beginShipListDrag(e, ship.id));
     el.addEventListener('pointerup', e => handleShipPointerUp(e, ship.id));
     el.innerHTML = `
       <div class="ship-blocks">${'<div class="ship-block"></div>'.repeat(ship.size)}</div>
@@ -272,6 +275,116 @@ function updateOrientationIndicator() {
   if (selected) selected.dataset.orientation = state.horizontal ? '↔' : '↕';
 }
 
+function beginShipListDrag(e, shipId) {
+  if (e.button !== 0 || state.placedShips.has(shipId)) return;
+  selectShip(shipId);
+  if (!state.selectedShip) return;
+  state.dragPlacement = {
+    ship: state.selectedShip,
+    original: null,
+    grabOffset: 0,
+    pointerId: e.pointerId,
+  };
+  document.body.classList.add('placing-drag');
+}
+
+function beginPlacedShipDrag(e, r, c) {
+  if (e.button !== 0) return;
+  const shipId = state.myBoard[r][c];
+  if (!shipId) return;
+  const ship = SHIPS.find(candidate => candidate.id === shipId);
+  const original = state.shipPlacements[shipId] || Placement.findShip(state.myBoard, shipId);
+  if (!ship || !original) return;
+
+  state.selectedShip = ship;
+  state.horizontal = original.horizontal;
+  state.dragPlacement = {
+    ship,
+    original: { row: original.row, col: original.col, size: ship.size, horizontal: original.horizontal },
+    grabOffset: original.horizontal ? c - original.col : r - original.row,
+    pointerId: e.pointerId,
+  };
+  Placement.clearShip(state.myBoard, shipId);
+  delete state.shipPlacements[shipId];
+  state.placedShips.delete(shipId);
+  document.getElementById('ready-btn').disabled = true;
+  document.querySelectorAll('.ship-item').forEach(el => el.classList.remove('selected'));
+  const item = document.getElementById(`ship-item-${shipId}`);
+  item.classList.remove('placed');
+  item.classList.add('selected');
+  updateOrientationIndicator();
+  renderPlacementBoard();
+  document.body.classList.add('placing-drag');
+  e.preventDefault();
+}
+
+function placementAtPointer(e) {
+  const target = document.elementFromPoint(e.clientX, e.clientY)?.closest('#place-board .cell');
+  if (!target || !state.dragPlacement) return null;
+  const row = Number(target.dataset.r);
+  const col = Number(target.dataset.c);
+  const { ship, grabOffset } = state.dragPlacement;
+  return {
+    row: state.horizontal ? row : row - grabOffset,
+    col: state.horizontal ? col - grabOffset : col,
+    size: ship.size,
+    horizontal: state.horizontal,
+  };
+}
+
+function handlePlacementPointerMove(e) {
+  if (!state.dragPlacement || e.pointerId !== state.dragPlacement.pointerId) return;
+  const placement = placementAtPointer(e);
+  clearPreview();
+  if (!placement) {
+    state.hoverCell = null;
+    return;
+  }
+  state.hoverCell = [placement.row, placement.col];
+  showPreview(placement.row, placement.col);
+  e.preventDefault();
+}
+
+function commitShipPlacement(ship, placement, selectNext = true) {
+  if (!Placement.placeShip(state.myBoard, ship.id, placement)) return false;
+  state.shipPlacements[ship.id] = { ...placement };
+  state.placedShips.add(ship.id);
+  renderPlacementBoard();
+  const item = document.getElementById(`ship-item-${ship.id}`);
+  item.classList.add('placed');
+  item.classList.remove('selected');
+  item.removeAttribute('data-orientation');
+  state.selectedShip = null;
+
+  const next = selectNext && SHIPS.find(candidate => !state.placedShips.has(candidate.id));
+  if (next) selectShip(next.id);
+  document.getElementById('ready-btn').disabled = state.placedShips.size !== SHIPS.length;
+  return true;
+}
+
+function finishPlacementDrag(e, cancelled = false) {
+  const drag = state.dragPlacement;
+  if (!drag || e.pointerId !== drag.pointerId) return;
+  const placement = cancelled ? null : placementAtPointer(e);
+  const committed = placement && commitShipPlacement(drag.ship, placement, !drag.original);
+
+  if (!committed && drag.original) commitShipPlacement(drag.ship, drag.original, false);
+  if (!committed && !drag.original) {
+    state.selectedShip = drag.ship;
+    document.getElementById(`ship-item-${drag.ship.id}`).classList.add('selected');
+    updateOrientationIndicator();
+  }
+
+  state.dragPlacement = null;
+  state.hoverCell = null;
+  clearPreview();
+  document.body.classList.remove('placing-drag');
+}
+
+document.addEventListener('pointermove', handlePlacementPointerMove, { passive: false });
+document.addEventListener('pointerup', e => finishPlacementDrag(e));
+document.addEventListener('pointercancel', e => finishPlacementDrag(e, true));
+
 function onPlaceCellHover(r, c) {
   state.hoverCell = [r, c];
   clearPreview();
@@ -304,23 +417,8 @@ function onPlaceCellClick(r, c) {
   if (!state.selectedShip) return;
   const ship = state.selectedShip;
   const placement = { row: r, col: c, size: ship.size, horizontal: state.horizontal };
-  if (!Placement.placeShip(state.myBoard, ship.id, placement)) return;
-  const cells = Placement.cellsForPlacement(placement);
-
-  cells.forEach(([rr, cc]) => {
-    getCell('place-board', rr, cc).classList.add('ship');
-  });
-  state.shipPlacements[ship.id] = placement;
+  if (!commitShipPlacement(ship, placement)) return;
   clearPreview();
-
-  state.placedShips.add(ship.id);
-  document.getElementById(`ship-item-${ship.id}`).classList.add('placed');
-  state.selectedShip = null;
-  document.querySelectorAll('.ship-item').forEach(el => el.classList.remove('selected'));
-
-  const next = SHIPS.find(s => !state.placedShips.has(s.id));
-  if (next) selectShip(next.id);
-  else document.getElementById('ready-btn').disabled = false;
 }
 
 function getShipCells(r, c, size, horiz) {
@@ -631,6 +729,7 @@ function buildBoard(id, onClick, onHover, onLeave, noClick) {
       cell.dataset.r = r;
       cell.dataset.c = c;
       if (onClick) cell.addEventListener('click', () => onClick(r, c));
+      if (id === 'place-board') cell.addEventListener('pointerdown', e => beginPlacedShipDrag(e, r, c));
       if (onHover) cell.addEventListener('mouseenter', () => onHover(r, c));
       if (onLeave) {
         const wrap = document.getElementById(id);

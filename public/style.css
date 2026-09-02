@@ -96,7 +96,7 @@ h3 { font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: upp
 .ship-item {
   display: flex; align-items: center; gap: 8px; padding: 10px 14px;
   background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
-  cursor: pointer; transition: all 0.15s; touch-action: manipulation;
+  cursor: grab; transition: all 0.15s; touch-action: none;
 }
 .ship-item.selected { border-color: var(--accent); background: var(--surface2); }
 .ship-item.selected::after {
@@ -136,6 +136,9 @@ h3 { font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: upp
 }
 .cell:hover { background: var(--surface2); }
 .cell.ship { background: var(--ship); }
+#place-board { touch-action: none; }
+#place-board .cell.ship { cursor: grab; }
+body.placing-drag, body.placing-drag * { cursor: grabbing !important; user-select: none; }
 .cell.ship-preview { background: rgba(0,212,255,0.25); }
 .cell.ship-invalid { background: rgba(255,68,68,0.25); }
 .cell.hit { background: var(--hit); }
