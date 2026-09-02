@@ -33,16 +33,17 @@
     "playAgain": "Jugar de Nuevo",
     "mainMenu": "Menú Principal",
     "leaderboard": "🏆 Clasificación",
-    "localLobby": "Sala local",
-    "playPrivateAI": "Jugar contra la computadora",
-    "retryLobby": "Reintentar sala"
+    "quickMatch": "Partida rápida",
+    "privateRoom": "Sala privada",
+    "cancel": "Cancelar",
+    "findNewOpponent": "Buscar otro oponente"
   },
   "seo": {
     "h2": "Juega a la Batalla Naval Online — Gratis, Sin Descargas",
     "intro": "Batalla Naval Online es una versión gratuita para navegador del clásico juego de estrategia naval. Esconde tu flota en una cuadrícula de 10×10 y túrnate para disparar a los barcos ocultos de tu oponente hasta hundir su flota. Juega solo contra una IA inteligente o desafía a un amigo en el multijugador online en tiempo real: sin descargas, sin registros y sin anuncios. Funciona al instante en escritorio y móviles.",
     "howToTitle": "Cómo Jugar a la Batalla Naval Online",
     "howToSteps": [
-      "Elige un modo: lucha contra la computadora (Fácil, Medio o Difícil) o crea una sala multijugador para jugar con un amigo.",
+      "Elige un modo: usa Partida rápida para encontrar un oponente, lucha contra la computadora (Fácil, Medio o Difícil) o crea una Sala privada para un amigo.",
       "Coloca tu flota: posiciona tus cinco barcos en la cuadrícula. Pulsa Rotar (R) para girar un barco, o pulsa Aleatorio para un diseño instantáneo.",
       "Túrnense para disparar: haz clic en un cuadro de la cuadrícula de tu oponente para disparar. Un acierto se marca en rojo, un fallo en gris.",
       "Hunde todos los barcos: el primer almirante en hundir toda la flota enemiga gana la batalla."
@@ -50,7 +51,7 @@
     "featuresTitle": "Características del Juego",
     "features": [
       "Un jugador vs IA con tres niveles de dificultad: desde disparos aleatorios hasta búsqueda basada en probabilidad.",
-      "Multijugador online para 2 jugadores: crea una sala y comparte el código o enlace para jugar con un amigo en tiempo real.",
+      "Multijugador online para 2 jugadores: encuentra un oponente con Partida rápida o crea y comparte una Sala privada para jugar con un amigo en tiempo real.",
       "Gratis e instantáneo: sin cuenta, sin instalación, sin necesidad de descarga.",
       "Juega en cualquier lugar: funciona en cualquier navegador moderno en escritorio, teléfono o tableta."
     ],
@@ -62,7 +63,7 @@
       },
       {
         "q": "¿Puedo jugar a la Batalla Naval online con un amigo?",
-        "a": "Sí. Elige Multijugador, crea una sala y comparte el código o enlace. Jugarán una partida en vivo para 2 jugadores en tiempo real."
+        "a": "Sí. Usa Partida rápida para encontrar un oponente o crea una Sala privada y comparte su código o enlace con un amigo. Jugarán una partida para 2 jugadores en tiempo real."
       },
       {
         "q": "¿Necesito descargar o instalar algo?",
@@ -112,12 +113,13 @@
     "youMissed": "Fallaste en {cell}",
     "oppHit": "El oponente acertó en {cell}",
     "oppMissed": "El oponente falló en {cell}",
-    "autoConnecting": "Entrando en la sala local…",
-    "autoAssigned": "Eres el jugador {player}.",
-    "autoWaiting": "Esperando al jugador 2…",
-    "autoFullBadge": "Sala llena",
-    "autoFull": "La sala local está llena. Puedes iniciar una partida privada contra la computadora.",
-    "autoOpponentLeft": "Tu oponente se fue. Esperando a otro jugador…"
+    "matchSearching": "Buscando…",
+    "matchWaiting": "Buscando un oponente…",
+    "matchWaitingPosition": "Esperando a un oponente… Posición en la cola: {position}.",
+    "matchError": "Error de emparejamiento",
+    "matchOpponentLeft": "El oponente se fue",
+    "matchOpponentLeftDetail": "Tu oponente se fue. Busca otro o juega contra la computadora.",
+    "matchedWith": "Emparejado con {name}"
   },
   "_meta": {
     "site": "battleship",

@@ -33,16 +33,17 @@
     "playAgain": "Nochmal spielen",
     "mainMenu": "Hauptmenü",
     "leaderboard": "🏆 Bestenliste",
-    "localLobby": "Lokale Lobby",
-    "playPrivateAI": "Gegen Computer spielen",
-    "retryLobby": "Lobby erneut versuchen"
+    "quickMatch": "Schnelles Spiel",
+    "privateRoom": "Privater Raum",
+    "cancel": "Abbrechen",
+    "findNewOpponent": "Neuen Gegner suchen"
   },
   "seo": {
     "h2": "Schiffe versenken online spielen — Kostenlos, ohne Download",
     "intro": "Schiffe versenken online ist eine kostenlose Browser-Version des klassischen Strategie-Brettspiels. Verstecke deine Flotte auf einem 10×10-Gitter und feuere abwechselnd auf die Schiffe deines Gegners, bis eine Flotte versenkt ist. Spiele solo gegen eine intelligente KI oder fordere Freunde im Echtzeit-Mehrspielermodus heraus — ohne Download, ohne Anmeldung und werbefrei. Läuft sofort auf Desktop und Mobilgeräten.",
     "howToTitle": "So spielst du Schiffe versenken online",
     "howToSteps": [
-      "Wähle einen Modus — kämpfe gegen den Computer (Einfach, Mittel oder Schwer) oder erstelle einen Mehrspieler-Raum für Freunde.",
+      "Wähle einen Modus — finde über „Schnelles Spiel“ einen Gegner, kämpfe gegen den Computer (Einfach, Mittel oder Schwer) oder erstelle einen privaten Raum für Freunde.",
       "Platziere deine Flotte — positioniere deine fünf Schiffe auf dem Gitter. Drücke Drehen (R) zum Wenden oder Zufällig für ein schnelles Layout.",
       "Abwechselnd feuern — klicke auf ein Feld im gegnerischen Gitter. Ein Treffer wird rot markiert, ein Fehlschuss grau.",
       "Alle Schiffe versenken — der erste Admiral, der die gesamte feindliche Flotte versenkt, gewinnt die Schlacht."
@@ -50,7 +51,7 @@
     "featuresTitle": "Spiel-Features",
     "features": [
       "Einzelspieler gegen KI mit drei Schwierigkeitsstufen — von Zufallsschüssen bis hin zur Wahrscheinlichkeitsberechnung.",
-      "Online-Mehrspieler für 2 Spieler — erstelle einen Raum und teile den Code oder Link, um in Echtzeit gegen Freunde zu spielen.",
+      "Online-Mehrspieler für 2 Spieler — finde über „Schnelles Spiel“ einen Gegner oder erstelle und teile einen privaten Raum, um in Echtzeit gegen Freunde zu spielen.",
       "Kostenlos und sofort — kein Account, keine Installation, kein Download erforderlich.",
       "Überall spielbar — funktioniert in jedem modernen Browser auf Desktop, Smartphone oder Tablet."
     ],
@@ -62,7 +63,7 @@
       },
       {
         "q": "Kann ich Schiffe versenken online mit Freunden spielen?",
-        "a": "Ja. Wähle Mehrspieler, erstelle einen Raum und teile den Code oder Link. Ihr spielt ein Live-Duell in Echtzeit gegeneinander."
+        "a": "Ja. Finde über „Schnelles Spiel“ einen Gegner oder erstelle einen privaten Raum und teile den Code oder Link mit Freunden. Ihr spielt ein Duell in Echtzeit."
       },
       {
         "q": "Muss ich etwas herunterladen oder installieren?",
@@ -112,12 +113,13 @@
     "youMissed": "Fehlschuss auf {cell}",
     "oppHit": "Gegner trifft {cell}",
     "oppMissed": "Gegner verfehlt {cell}",
-    "autoConnecting": "Lokale Lobby wird betreten…",
-    "autoAssigned": "Du bist Spieler {player}.",
-    "autoWaiting": "Warte auf Spieler 2…",
-    "autoFullBadge": "Lobby voll",
-    "autoFull": "Die lokale Lobby ist voll. Du kannst ein privates Spiel gegen den Computer starten.",
-    "autoOpponentLeft": "Dein Gegner hat die Lobby verlassen. Warte auf einen neuen Spieler…"
+    "matchSearching": "Suche…",
+    "matchWaiting": "Gegner wird gesucht…",
+    "matchWaitingPosition": "Warte auf einen Gegner… Warteschlangenposition: {position}.",
+    "matchError": "Fehler bei der Spielersuche",
+    "matchOpponentLeft": "Gegner hat das Spiel verlassen",
+    "matchOpponentLeftDetail": "Dein Gegner ist gegangen. Suche einen neuen oder spiele gegen den Computer.",
+    "matchedWith": "Gegner: {name}"
   },
   "_meta": {
     "site": "battleship",

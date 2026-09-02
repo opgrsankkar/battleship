@@ -35,6 +35,17 @@ function connect(url) {
   });
 }
 
+async function openServer() {
+  const game = createGameServer();
+  await new Promise(resolve => game.server.listen(0, '127.0.0.1', resolve));
+  return { game, url: `http://127.0.0.1:${game.server.address().port}` };
+}
+
+async function closeServer(game, clients) {
+  clients.forEach(client => client.disconnect());
+  await new Promise(resolve => game.io.close(resolve));
+}
+
 test('validateFleet accepts the standard fleet and rejects malformed boards', () => {
   const board = validFleet();
   assert.equal(validateFleet(board), true);
@@ -60,77 +71,126 @@ test('validCoordinate only accepts integer board coordinates', () => {
   assert.equal(validCoordinate('2'), false);
 });
 
-test('automatic lobby assigns two seats, rejects overflow, and promotes the remaining player', { timeout: 10000 }, async () => {
-  const game = createGameServer({ autoLobby: true });
-  await new Promise(resolve => game.server.listen(0, '127.0.0.1', resolve));
-  const address = game.server.address();
-  const url = `http://127.0.0.1:${address.port}`;
+test('Quick Match pairs every two players into independent FIFO matches', { timeout: 10000 }, async () => {
+  const { game, url } = await openServer();
   const clients = [];
-
   try {
-    assert.deepEqual(await fetch(`${url}/api/config`).then(response => response.json()), { autoLobby: true });
-    const player1 = await connect(url);
-    clients.push(player1);
-    const assignment1 = waitFor(player1, 'auto_lobby_assigned');
-    player1.emit('auto_lobby_join', { name: 'One' });
-    assert.deepEqual(await assignment1, { playerNumber: 1, waiting: true, code: 'AUTO' });
+    const [one, two, three, four] = await Promise.all([
+      connect(url), connect(url), connect(url), connect(url),
+    ]);
+    clients.push(one, two, three, four);
 
-    const player2 = await connect(url);
-    clients.push(player2);
-    const player1Ready = waitFor(player1, 'opponent_joined');
-    const assignment2 = waitFor(player2, 'auto_lobby_assigned');
-    player2.emit('auto_lobby_join', { name: 'Two' });
-    assert.deepEqual(await assignment2, { playerNumber: 2, waiting: false, code: 'AUTO' });
-    await player1Ready;
+    const waitingOne = waitFor(one, 'matchmaking_waiting');
+    one.emit('matchmaking_join', { name: 'One' });
+    assert.deepEqual(await waitingOne, { position: 1 });
 
-    const overflow = await connect(url);
-    clients.push(overflow);
-    const full = waitFor(overflow, 'lobby_full');
-    overflow.emit('auto_lobby_join', { name: 'Three' });
-    await full;
+    const matchOne = waitFor(one, 'match_found');
+    const matchTwo = waitFor(two, 'match_found');
+    two.emit('matchmaking_join', { name: 'Two' });
+    const [oneResult, twoResult] = await Promise.all([matchOne, matchTwo]);
+    assert.equal(oneResult.code, twoResult.code);
+    assert.equal(oneResult.playerNumber, 1);
+    assert.equal(twoResult.playerNumber, 2);
+    assert.equal(oneResult.opponentName, 'Two');
+    assert.equal(twoResult.opponentName, 'One');
 
-    const placementError = waitFor(player1, 'placement_error');
-    player1.emit('ships_placed', { code: 'AUTO', board: Array.from({ length: 10 }, () => Array(10).fill(0)) });
+    const waitingThree = waitFor(three, 'matchmaking_waiting');
+    three.emit('matchmaking_join', { name: 'Three' });
+    assert.deepEqual(await waitingThree, { position: 1 });
+
+    const matchThree = waitFor(three, 'match_found');
+    const matchFour = waitFor(four, 'match_found');
+    four.emit('matchmaking_join', { name: 'Four' });
+    const [threeResult, fourResult] = await Promise.all([matchThree, matchFour]);
+    assert.equal(threeResult.code, fourResult.code);
+    assert.notEqual(oneResult.code, threeResult.code);
+    assert.equal(threeResult.playerNumber, 1);
+    assert.equal(fourResult.playerNumber, 2);
+    assert.equal(game.waitingPlayers.length, 0);
+    assert.equal(game.rooms[oneResult.code].kind, 'matchmaking');
+    assert.equal(game.rooms[threeResult.code].kind, 'matchmaking');
+
+    const placementError = waitFor(one, 'placement_error');
+    one.emit('ships_placed', {
+      code: oneResult.code,
+      board: Array.from({ length: 10 }, () => Array(10).fill(0)),
+    });
     assert.equal(await placementError, 'Invalid fleet placement');
 
-    const left = waitFor(player1, 'opponent_disconnected');
-    const reassignedAfterLeave = waitFor(player1, 'auto_lobby_assigned');
-    player2.emit('auto_lobby_leave');
-    await left;
-    assert.deepEqual(await reassignedAfterLeave, { playerNumber: 1, waiting: true, code: 'AUTO' });
+    const starts = [waitFor(one, 'game_start'), waitFor(two, 'game_start')];
+    one.emit('ships_placed', { code: oneResult.code, board: validFleet() });
+    two.emit('ships_placed', { code: oneResult.code, board: validFleet() });
+    await Promise.all(starts);
 
-    const replacement = await connect(url);
-    clients.push(replacement);
-    const replacementAssignment = waitFor(replacement, 'auto_lobby_assigned');
-    replacement.emit('auto_lobby_join', { name: 'Four' });
-    assert.deepEqual(await replacementAssignment, { playerNumber: 2, waiting: false, code: 'AUTO' });
+    let leakedToOtherMatch = false;
+    three.once('attack_result', () => { leakedToOtherMatch = true; });
+    const attackResult = waitFor(one, 'attack_result');
+    one.emit('attack', { code: oneResult.code, row: 0, col: 0 });
+    assert.equal((await attackResult).hit, true);
+    await new Promise(resolve => setTimeout(resolve, 20));
+    assert.equal(leakedToOtherMatch, false);
 
-    const disconnected = waitFor(player1, 'opponent_disconnected');
-    const reassignedAfterDisconnect = waitFor(player1, 'auto_lobby_assigned');
-    replacement.disconnect();
-    await disconnected;
-    assert.deepEqual(await reassignedAfterDisconnect, { playerNumber: 1, waiting: true, code: 'AUTO' });
+    const opponentLeft = waitFor(one, 'opponent_disconnected');
+    two.emit('leave_game');
+    await opponentLeft;
+    assert.equal(game.rooms[oneResult.code], undefined);
   } finally {
-    clients.forEach(client => client.disconnect());
-    await new Promise(resolve => game.io.close(resolve));
+    await closeServer(game, clients);
   }
 });
 
-test('automatic lobby protocol is disabled unless configured', { timeout: 5000 }, async () => {
-  const game = createGameServer({ autoLobby: false });
-  await new Promise(resolve => game.server.listen(0, '127.0.0.1', resolve));
-  const address = game.server.address();
-  const client = await connect(`http://127.0.0.1:${address.port}`);
+test('Quick Match cancellation and waiting-player disconnect clean up the queue', { timeout: 5000 }, async () => {
+  const { game, url } = await openServer();
+  const clients = [];
   try {
-    assert.deepEqual(
-      await fetch(`http://127.0.0.1:${address.port}/api/config`).then(response => response.json()),
-      { autoLobby: false },
-    );
-    const unavailable = waitFor(client, 'auto_lobby_unavailable');
-    client.emit('auto_lobby_join', { name: 'One' });
-    await unavailable;
+    const player = await connect(url);
+    clients.push(player);
+    const waiting = waitFor(player, 'matchmaking_waiting');
+    player.emit('matchmaking_join', { name: 'Waiting' });
+    await waiting;
+    assert.equal(game.waitingPlayers.length, 1);
+
+    const duplicateWaiting = waitFor(player, 'matchmaking_waiting');
+    player.emit('matchmaking_join', { name: 'Duplicate' });
+    assert.deepEqual(await duplicateWaiting, { position: 1 });
+    assert.equal(game.waitingPlayers.length, 1);
+    assert.equal(game.waitingPlayers[0].name, 'Waiting');
+
+    const cancelled = waitFor(player, 'matchmaking_cancelled');
+    player.emit('matchmaking_cancel');
+    await cancelled;
+    assert.equal(game.waitingPlayers.length, 0);
+
+    const waitingAgain = waitFor(player, 'matchmaking_waiting');
+    player.emit('matchmaking_join', { name: 'Waiting' });
+    await waitingAgain;
+    player.disconnect();
+    await new Promise(resolve => setTimeout(resolve, 20));
+    assert.equal(game.waitingPlayers.length, 0);
   } finally {
-    client.disconnect();
-    await new Promise(resolve => game.io.close(resolve));
+    await closeServer(game, clients);
+  }
+});
+
+test('private room creation and joining remain available', { timeout: 5000 }, async () => {
+  const { game, url } = await openServer();
+  const clients = [];
+  try {
+    const host = await connect(url);
+    const guest = await connect(url);
+    clients.push(host, guest);
+
+    const created = waitFor(host, 'room_created');
+    host.emit('create_room', { name: 'Host' });
+    const { code } = await created;
+
+    const hostJoined = waitFor(host, 'opponent_joined');
+    const guestJoined = waitFor(guest, 'room_joined');
+    guest.emit('join_room', { code, name: 'Guest' });
+    assert.deepEqual(await guestJoined, { code });
+    await hostJoined;
+    assert.equal(game.rooms[code].kind, 'private');
+  } finally {
+    await closeServer(game, clients);
   }
 });

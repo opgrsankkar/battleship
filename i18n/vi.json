@@ -33,16 +33,17 @@
     "playAgain": "Chơi lại",
     "mainMenu": "Menu chính",
     "leaderboard": "🏆 Bảng xếp hạng",
-    "localLobby": "Phòng cục bộ",
-    "playPrivateAI": "Đấu với máy",
-    "retryLobby": "Thử lại phòng chờ"
+    "quickMatch": "Đấu nhanh",
+    "privateRoom": "Phòng riêng",
+    "cancel": "Hủy",
+    "findNewOpponent": "Tìm đối thủ mới"
   },
   "seo": {
     "h2": "Chơi Hải chiến Online — Miễn phí, không cần tải về",
     "intro": "Hải chiến Online là phiên bản miễn phí trên trình duyệt của trò chơi chiến thuật hải quân cổ điển. Giấu hạm đội của bạn trên lưới 10×10, sau đó thay phiên nhau bắn vào các tàu đang ẩn nấp của đối phương cho đến khi một hạm đội bị đánh chìm hoàn toàn. Chơi đơn với AI thông minh hoặc thách đấu bạn bè trong chế độ 2 người chơi trực tuyến thời gian thực — không cần tải về, không cần đăng ký và không có quảng cáo. Chạy mượt mà trên cả máy tính và điện thoại.",
     "howToTitle": "Cách chơi Hải chiến Online",
     "howToSteps": [
-      "Chọn một chế độ — đấu với máy (Dễ, Trung bình hoặc Khó) hoặc tạo phòng để chơi cùng bạn bè.",
+      "Chọn một chế độ — dùng Đấu nhanh để tìm đối thủ, đấu với máy (Dễ, Trung bình hoặc Khó) hoặc tạo Phòng riêng cho bạn bè.",
       "Sắp xếp hạm đội — đặt năm con tàu của bạn lên lưới. Nhấn Xoay (R) để lật tàu, hoặc nhấn Ngẫu nhiên để tự động sắp xếp.",
       "Thay phiên nhau bắn — nhấp vào một ô trên lưới của đối thủ để khai hỏa. Phát bắn trúng được đánh dấu màu đỏ, bắn trượt màu xám.",
       "Đánh chìm mọi con tàu — đô đốc đầu tiên đánh chìm toàn bộ hạm đội địch sẽ giành chiến thắng."
@@ -50,7 +51,7 @@
     "featuresTitle": "Tính năng trò chơi",
     "features": [
       "Chế độ chơi đơn với AI có ba mức độ khó — từ bắn ngẫu nhiên đến săn lùng dựa trên xác suất.",
-      "Chế độ 2 người chơi trực tuyến — tạo phòng và chia sẻ mã hoặc liên kết để đấu với bạn bè trong thời gian thực.",
+      "Chế độ 2 người chơi trực tuyến — tìm đối thủ bằng Đấu nhanh hoặc tạo và chia sẻ Phòng riêng để đấu với bạn bè trong thời gian thực.",
       "Miễn phí và tức thì — không cần tài khoản, không cần cài đặt, không cần tải về.",
       "Chơi mọi nơi — hoạt động trên mọi trình duyệt hiện đại trên máy tính, điện thoại hoặc máy tính bảng."
     ],
@@ -62,7 +63,7 @@
       },
       {
         "q": "Tôi có thể chơi Hải chiến online với bạn bè không?",
-        "a": "Có. Chọn Nhiều người chơi, tạo phòng và chia sẻ mã phòng hoặc liên kết. Bạn có thể đấu trực tiếp với nhau trong thời gian thực."
+        "a": "Có. Dùng Đấu nhanh để tìm đối thủ hoặc tạo Phòng riêng rồi chia sẻ mã hay liên kết với bạn bè. Bạn có thể đấu trực tiếp trong thời gian thực."
       },
       {
         "q": "Tôi có cần tải hay cài đặt gì không?",
@@ -112,12 +113,13 @@
     "youMissed": "Bạn bắn trượt {cell}",
     "oppHit": "Đối thủ bắn trúng {cell}",
     "oppMissed": "Đối thủ bắn trượt {cell}",
-    "autoConnecting": "Đang tham gia phòng cục bộ…",
-    "autoAssigned": "Bạn là Người chơi {player}.",
-    "autoWaiting": "Đang chờ Người chơi 2…",
-    "autoFullBadge": "Phòng đã đầy",
-    "autoFull": "Phòng cục bộ đã đầy. Bạn có thể bắt đầu một ván riêng với máy.",
-    "autoOpponentLeft": "Đối thủ đã rời đi. Đang chờ người chơi khác…"
+    "matchSearching": "Đang tìm…",
+    "matchWaiting": "Đang tìm đối thủ…",
+    "matchWaitingPosition": "Đang chờ đối thủ… Vị trí hàng đợi: {position}.",
+    "matchError": "Lỗi ghép trận",
+    "matchOpponentLeft": "Đối thủ đã rời đi",
+    "matchOpponentLeftDetail": "Đối thủ đã rời đi. Hãy tìm đối thủ mới hoặc đấu với máy.",
+    "matchedWith": "Đã ghép với {name}"
   },
   "_meta": {
     "site": "battleship",

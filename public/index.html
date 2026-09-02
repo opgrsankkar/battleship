@@ -112,9 +112,11 @@
       <div class="logo-icon">⚓</div>
       <h1>BATTLESHIP</h1>
     </div>
+    <input id="name-input" class="menu-name-input" type="text" placeholder="Your nickname" maxlength="24">
     <div class="menu-buttons">
-      <button class="btn btn-primary" onclick="startSinglePlayer()">VS Computer</button>
-      <button class="btn btn-secondary" onclick="showScreen('screen-mp-menu')">Multiplayer</button>
+      <button class="btn btn-primary" onclick="startQuickMatch()">Quick Match</button>
+      <button class="btn btn-secondary" onclick="startSinglePlayer()">VS Computer</button>
+      <button class="btn btn-ghost" onclick="showScreen('screen-mp-menu')">Private Room</button>
     </div>
     <div class="leaderboard-box">
       <h3>🏆 Leaderboard</h3>
@@ -125,15 +127,20 @@
     </div>
   </div>
 
-  <!-- Automatic local lobby -->
-  <div id="screen-auto-lobby" class="screen">
-    <h2>Local Lobby</h2>
-    <div class="auto-lobby-card">
-      <div class="auto-player-badge" id="auto-player-badge">Connecting…</div>
-      <p id="auto-lobby-status">Joining the local lobby…</p>
-      <div id="auto-overflow-actions" class="auto-lobby-actions hidden">
-        <button class="btn btn-primary" onclick="startOverflowAI()">Play vs Computer</button>
-        <button class="btn btn-ghost" onclick="retryAutoLobby()">Retry Lobby</button>
+  <!-- Quick Match -->
+  <div id="screen-matchmaking" class="screen">
+    <h2>Quick Match</h2>
+    <div class="matchmaking-card">
+      <div class="matchmaking-badge" id="matchmaking-badge">Searching…</div>
+      <p id="matchmaking-status">Waiting for an opponent…</p>
+      <div id="matchmaking-wait-actions" class="matchmaking-actions">
+        <button class="btn btn-secondary" onclick="startMatchmakingAI()">VS Computer</button>
+        <button class="btn btn-ghost" onclick="cancelQuickMatch()">Cancel</button>
+      </div>
+      <div id="matchmaking-disconnect-actions" class="matchmaking-actions hidden">
+        <button class="btn btn-primary" onclick="startQuickMatch()">Find New Opponent</button>
+        <button class="btn btn-secondary" onclick="startMatchmakingAI()">VS Computer</button>
+        <button class="btn btn-ghost" onclick="cancelQuickMatch()">Main Menu</button>
       </div>
     </div>
   </div>
@@ -142,7 +149,6 @@
   <div id="screen-mp-menu" class="screen">
     <h2>Multiplayer</h2>
     <div class="menu-buttons">
-      <input id="name-input" type="text" placeholder="Your nickname" maxlength="24" style="text-align:center;">
       <button class="btn btn-primary" onclick="createRoom()">Create Room</button>
       <div class="join-row">
         <input id="room-input" type="text" placeholder="Room code" maxlength="6">
@@ -173,6 +179,7 @@
   <!-- Ship Placement -->
   <div id="screen-placement" class="screen">
     <h2>Place Your Ships</h2>
+    <p id="match-info" class="match-info hidden"></p>
     <p style="font-size:.82rem;color:#94a3b8;text-align:center;margin:-.25rem 0 .75rem;line-height:1.5;">
       Drag ships onto the grid, or click to place them. Drag a placed ship to move it. Press <strong>R</strong> or double-tap a selected ship to rotate it, then hit <strong>Ready!</strong>
     </p>
@@ -325,7 +332,7 @@
   <script src="placement.js"></script>
   <!-- i18n:runtime:start -->
 <script>
-window.__I18N__ = {"ships":{"1":"Carrier","2":"Battleship","3":"Cruiser","4":"Submarine","5":"Destroyer"},"yourTurn":"Your Turn","oppTurn":"Opponent's Turn","victory":"VICTORY!","defeat":"DEFEAT","wonSub":"You sunk all enemy ships!","lostSub":"Your fleet has been destroyed.","copied":"Copied!","copyCode":"Copy Code","copyLink":"Copy Link","joiningRoom":"Joining room {code}…","waitingJoin":"Waiting for opponent to join…","oppReady":"Opponent is ready!","oppDisconnected":"Opponent disconnected.","youSunkTheir":"You sunk their {ship}!","theySunkYour":"They sunk your {ship}!","youHit":"You hit {cell}","youMissed":"You missed {cell}","oppHit":"Opponent hit {cell}","oppMissed":"Opponent missed {cell}","autoConnecting":"Joining the local lobby…","autoAssigned":"You are Player {player}.","autoWaiting":"Waiting for Player 2…","autoFullBadge":"Lobby Full","autoFull":"The local lobby is full. You can start a private AI game.","autoOpponentLeft":"Your opponent left. Waiting for another player…"};
+window.__I18N__ = {"ships":{"1":"Carrier","2":"Battleship","3":"Cruiser","4":"Submarine","5":"Destroyer"},"yourTurn":"Your Turn","oppTurn":"Opponent's Turn","victory":"VICTORY!","defeat":"DEFEAT","wonSub":"You sunk all enemy ships!","lostSub":"Your fleet has been destroyed.","copied":"Copied!","copyCode":"Copy Code","copyLink":"Copy Link","joiningRoom":"Joining room {code}…","waitingJoin":"Waiting for opponent to join…","oppReady":"Opponent is ready!","oppDisconnected":"Opponent disconnected.","youSunkTheir":"You sunk their {ship}!","theySunkYour":"They sunk your {ship}!","youHit":"You hit {cell}","youMissed":"You missed {cell}","oppHit":"Opponent hit {cell}","oppMissed":"Opponent missed {cell}","matchSearching":"Searching…","matchWaiting":"Looking for an opponent…","matchWaitingPosition":"Waiting for an opponent… Queue position: {position}.","matchError":"Matchmaking error","matchOpponentLeft":"Opponent left","matchOpponentLeftDetail":"Your opponent left. Find another opponent or play against the computer.","matchedWith":"Matched with {name}"};
 window.t = function(k, p){ var d = window.__I18N__ || {}; var s = String(k).split('.').reduce(function(o,i){return (o==null)?undefined:o[i];}, d); if (s == null) s = k; if (p) for (var n in p) s = s.split('{'+n+'}').join(p[n]); return s; };
 </script>
 <!-- i18n:runtime:end -->

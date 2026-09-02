@@ -89,22 +89,23 @@ h3 { font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: upp
 }
 .btn-copy:hover { background: var(--accent); color: #000; }
 
-.auto-lobby-card {
+.matchmaking-card {
   width: min(440px, calc(100% - 24px)); padding: 28px;
   display: flex; flex-direction: column; align-items: center; gap: 18px;
   background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
   text-align: center;
 }
-.auto-player-badge {
+.matchmaking-badge {
   padding: 8px 16px; border-radius: 999px; background: var(--surface2);
   color: var(--accent); font-size: 14px; font-weight: 800; letter-spacing: 2px;
   text-transform: uppercase;
 }
-#auto-lobby-status { min-height: 24px; color: var(--text); line-height: 1.5; }
-.auto-lobby-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-.auto-lobby-actions .btn { width: auto; }
+#matchmaking-status { min-height: 24px; color: var(--text); line-height: 1.5; }
+.matchmaking-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.matchmaking-actions .btn { width: auto; }
 
 .hint { font-size: 12px; color: var(--text-dim); margin-top: 16px; text-align: center; }
+.match-info { color: var(--accent); font-size: 13px; font-weight: 700; margin: -20px 0 12px; }
 
 /* PLACEMENT */
 .placement-layout { display: flex; gap: 32px; align-items: flex-start; flex-wrap: wrap; justify-content: center; }
@@ -264,6 +265,7 @@ table.leaderboard tr.lb-me { color: var(--accent); font-weight: 700; }
   padding: 12px 16px; border-radius: 8px; border: 1px solid #1e4070;
   background: #0d2040; color: #d0e8ff; font-size: 15px; width: 100%;
 }
+.menu-name-input { max-width: 240px; margin-bottom: 12px; text-align: center; }
 
 /* ── SEO / informational content (below the game) ── */
 .seo-content {

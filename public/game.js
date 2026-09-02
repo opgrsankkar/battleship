@@ -19,8 +19,9 @@ let state = {
   mode: null,          // 'single' | 'multi'
   difficulty: 'medium',
   roomCode: null,
-  autoLobby: false,
+  quickMatch: false,
   playerNumber: null,
+  opponentName: null,
   myBoard: null,       // 10x10, cell = 0|shipId
   oppHits: null,       // 10x10 bool — cells I've attacked on opp board
   myHits: null,        // 10x10 bool — cells opp has attacked on my board
@@ -50,6 +51,7 @@ let state = {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
   if (id === 'screen-menu') history.replaceState(null, '', '/');
 }
 
@@ -79,8 +81,6 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('room-input').value = room.toUpperCase();
     document.getElementById('mp-status').textContent = T('joiningRoom', { code: room.toUpperCase() });
     socket.emit('join_room', { code: room.toUpperCase(), name: currentName() });
-  } else {
-    loadClientConfig();
   }
 });
 
@@ -107,35 +107,44 @@ async function loadLeaderboard() {
   } catch { body.innerHTML = '<tr><td colspan="5">Leaderboard unavailable.</td></tr>'; }
 }
 
-async function loadClientConfig() {
-  try {
-    const response = await fetch('/api/config');
-    const config = await response.json();
-    if (config.autoLobby) retryAutoLobby();
-  } catch {
-    // Static deployments and older servers keep the normal menu.
-  }
-}
-
-function retryAutoLobby() {
-  state.autoLobby = true;
+function startQuickMatch() {
+  hideResult();
+  state.quickMatch = true;
   state.mode = 'multi';
-  state.roomCode = 'AUTO';
-  document.getElementById('auto-player-badge').textContent = T('autoConnecting');
-  document.getElementById('auto-lobby-status').textContent = T('autoConnecting');
-  document.getElementById('auto-overflow-actions').classList.add('hidden');
-  showScreen('screen-auto-lobby');
-  socket.emit('auto_lobby_join', { name: currentName() });
+  state.roomCode = null;
+  state.playerNumber = null;
+  state.opponentName = null;
+  document.getElementById('matchmaking-badge').textContent = T('matchSearching');
+  document.getElementById('matchmaking-status').textContent = T('matchWaiting');
+  document.getElementById('matchmaking-wait-actions').classList.remove('hidden');
+  document.getElementById('matchmaking-disconnect-actions').classList.add('hidden');
+  showScreen('screen-matchmaking');
+  socket.emit('matchmaking_join', { name: currentName() });
 }
 
-function startOverflowAI() {
-  state.autoLobby = false;
+function cancelQuickMatch() {
+  socket.emit('matchmaking_cancel');
+  state.quickMatch = false;
   state.playerNumber = null;
+  state.opponentName = null;
+  state.roomCode = null;
+  state.mode = null;
+  showScreen('screen-menu');
+}
+
+function startMatchmakingAI() {
+  socket.emit('matchmaking_cancel');
+  state.quickMatch = false;
+  state.playerNumber = null;
+  state.opponentName = null;
+  state.roomCode = null;
   startSinglePlayer();
 }
 
 // ── Menu actions ──────────────────────────────────────────────────────────────
 function startSinglePlayer() {
+  state.quickMatch = false;
+  state.opponentName = null;
   state.mode = 'single';
   showScreen('screen-difficulty');
 }
@@ -164,35 +173,35 @@ function copyCode() {
 }
 
 // ── Socket events ─────────────────────────────────────────────────────────────
-socket.on('auto_lobby_assigned', ({ playerNumber, waiting, code }) => {
-  state.autoLobby = true;
+socket.on('matchmaking_waiting', ({ position }) => {
+  state.quickMatch = true;
+  state.mode = 'multi';
+  document.getElementById('matchmaking-badge').textContent = T('matchSearching');
+  document.getElementById('matchmaking-status').textContent = T('matchWaitingPosition', { position });
+  document.getElementById('matchmaking-wait-actions').classList.remove('hidden');
+  document.getElementById('matchmaking-disconnect-actions').classList.add('hidden');
+  showScreen('screen-matchmaking');
+});
+
+socket.on('match_found', ({ code, playerNumber, opponentName }) => {
+  state.quickMatch = true;
   state.mode = 'multi';
   state.roomCode = code;
   state.playerNumber = playerNumber;
-  document.getElementById('auto-player-badge').textContent = T('autoAssigned', { player: playerNumber });
-  document.getElementById('auto-lobby-status').textContent = waiting ? T('autoWaiting') : T('oppReady');
-  document.getElementById('auto-overflow-actions').classList.add('hidden');
-  showScreen('screen-auto-lobby');
+  state.opponentName = opponentName;
+  initPlacement();
+  showScreen('screen-placement');
 });
 
-socket.on('lobby_full', () => {
-  state.autoLobby = false;
-  state.mode = null;
-  state.roomCode = null;
-  state.playerNumber = null;
-  document.getElementById('auto-player-badge').textContent = T('autoFullBadge');
-  document.getElementById('auto-lobby-status').textContent = T('autoFull');
-  document.getElementById('auto-overflow-actions').classList.remove('hidden');
-  showScreen('screen-auto-lobby');
-});
-
-socket.on('auto_lobby_unavailable', () => {
-  state.autoLobby = false;
-  showScreen('screen-menu');
+socket.on('matchmaking_error', (message) => {
+  document.getElementById('matchmaking-badge').textContent = T('matchError');
+  document.getElementById('matchmaking-status').textContent = message;
+  showScreen('screen-matchmaking');
 });
 
 socket.on('room_created', ({ code }) => {
-  state.autoLobby = false;
+  state.quickMatch = false;
+  state.opponentName = null;
   state.roomCode = code;
   state.mode = 'multi';
   document.getElementById('room-code-text').textContent = code;
@@ -206,7 +215,8 @@ socket.on('join_error', (msg) => {
 });
 
 socket.on('room_joined', ({ code }) => {
-  state.autoLobby = false;
+  state.quickMatch = false;
+  state.opponentName = null;
   state.roomCode = code;
   state.mode = 'multi';
   initPlacement();
@@ -255,9 +265,14 @@ socket.on('attack_result', ({ attacker, row, col, hit, sunkShip, won, nextTurn }
 });
 
 socket.on('opponent_disconnected', () => {
-  if (state.autoLobby) {
-    document.getElementById('auto-lobby-status').textContent = T('autoOpponentLeft');
-    showScreen('screen-auto-lobby');
+  state.roomCode = null;
+  state.playerNumber = null;
+  if (state.quickMatch) {
+    document.getElementById('matchmaking-badge').textContent = T('matchOpponentLeft');
+    document.getElementById('matchmaking-status').textContent = T('matchOpponentLeftDetail');
+    document.getElementById('matchmaking-wait-actions').classList.add('hidden');
+    document.getElementById('matchmaking-disconnect-actions').classList.remove('hidden');
+    showScreen('screen-matchmaking');
   } else {
     if (!state.gameOver) alert(T('oppDisconnected'));
     showScreen('screen-menu');
@@ -274,6 +289,14 @@ function initPlacement() {
   state.dragPlacement = null;
   lastShipTap = { shipId: null, at: 0 };
   lastPlacedShipTap = { shipId: null, at: 0 };
+
+  const matchInfo = document.getElementById('match-info');
+  if (state.quickMatch && state.opponentName) {
+    matchInfo.textContent = T('matchedWith', { name: state.opponentName });
+    matchInfo.classList.remove('hidden');
+  } else {
+    matchInfo.classList.add('hidden');
+  }
 
   buildShipList();
   buildBoard('place-board', onPlaceCellClick, onPlaceCellHover, onPlaceBoardLeave);
@@ -903,9 +926,8 @@ function playAgain() {
   if (state.mode === 'single') {
     initPlacement();
     showScreen('screen-difficulty');
-  } else if (state.autoLobby) {
-    initPlacement();
-    showScreen('screen-placement');
+  } else if (state.quickMatch) {
+    startQuickMatch();
   } else {
     showScreen('screen-menu');
   }
@@ -913,9 +935,10 @@ function playAgain() {
 
 function leaveGameToMenu() {
   hideResult();
-  if (state.autoLobby) socket.emit('auto_lobby_leave');
-  state.autoLobby = false;
+  socket.emit('leave_game');
+  state.quickMatch = false;
   state.playerNumber = null;
+  state.opponentName = null;
   state.roomCode = null;
   state.mode = null;
   showScreen('screen-menu');

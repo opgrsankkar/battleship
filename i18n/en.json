@@ -39,16 +39,17 @@
     "playAgain": "Play Again",
     "mainMenu": "Main Menu",
     "leaderboard": "🏆 Leaderboard",
-    "localLobby": "Local Lobby",
-    "playPrivateAI": "Play vs Computer",
-    "retryLobby": "Retry Lobby"
+    "quickMatch": "Quick Match",
+    "privateRoom": "Private Room",
+    "cancel": "Cancel",
+    "findNewOpponent": "Find New Opponent"
   },
   "seo": {
     "h2": "Play Battleship Online — Free, No Download",
     "intro": "Battleship Online is a free, browser-based version of the classic naval strategy game. Hide your fleet on a 10×10 grid, then take turns firing at your opponent's hidden ships until one fleet is sunk. Play solo against a smart computer AI or challenge a friend to real-time 2-player online multiplayer — no download, no sign-up, and no ads. It runs instantly on desktop and mobile.",
     "howToTitle": "How to Play Battleship Online",
     "howToSteps": [
-      "Pick a mode — battle the computer (Easy, Medium, or Hard) or start a multiplayer room to play with a friend.",
+      "Pick a mode — use Quick Match to find an opponent, battle the computer (Easy, Medium, or Hard), or create a Private Room for a friend.",
       "Place your fleet — position your five ships on the grid. Press Rotate (R) to flip a ship, or hit Random for an instant layout.",
       "Take turns firing — click a square on your opponent's grid to fire. A hit is marked in red, a miss in grey.",
       "Sink every ship — the first admiral to sink the entire enemy fleet wins the battle."
@@ -56,14 +57,14 @@
     "featuresTitle": "Game Features",
     "features": [
       "Single-player vs AI with three difficulty levels — from random shots to probability-based hunting.",
-      "Online 2-player multiplayer — create a room and share the code or link to play a friend in real time.",
+      "Online 2-player multiplayer — find an opponent with Quick Match or create and share a Private Room to play a friend in real time.",
       "Free and instant — no account, no install, no download required.",
       "Plays anywhere — works in any modern browser on desktop, phone, or tablet."
     ],
     "faqTitle": "Frequently Asked Questions",
     "faqs": [
       { "q": "Is Battleship Online free to play?", "a": "Yes. It is completely free with no sign-up, no ads, and no download required — just open the page and play." },
-      { "q": "Can I play Battleship online with a friend?", "a": "Yes. Choose Multiplayer, create a room, and share the room code or link. You play a live 2-player game against each other in real time." },
+      { "q": "Can I play Battleship online with a friend?", "a": "Yes. Use Quick Match to find an opponent, or create a Private Room and share its code or link with a friend. You play a live 2-player game in real time." },
       { "q": "Do I need to download or install anything?", "a": "No. Battleship Online runs entirely in your web browser, so there is nothing to download or install on desktop or mobile." },
       { "q": "Can I play Battleship against the computer?", "a": "Yes. Single-player mode lets you battle an AI opponent with Easy, Medium, and Hard difficulty levels." },
       { "q": "Does Battleship Online work on mobile?", "a": "Yes. The game is designed to work on phones and tablets as well as desktop browsers." }
@@ -97,11 +98,12 @@
     "youMissed": "You missed {cell}",
     "oppHit": "Opponent hit {cell}",
     "oppMissed": "Opponent missed {cell}",
-    "autoConnecting": "Joining the local lobby…",
-    "autoAssigned": "You are Player {player}.",
-    "autoWaiting": "Waiting for Player 2…",
-    "autoFullBadge": "Lobby Full",
-    "autoFull": "The local lobby is full. You can start a private AI game.",
-    "autoOpponentLeft": "Your opponent left. Waiting for another player…"
+    "matchSearching": "Searching…",
+    "matchWaiting": "Looking for an opponent…",
+    "matchWaitingPosition": "Waiting for an opponent… Queue position: {position}.",
+    "matchError": "Matchmaking error",
+    "matchOpponentLeft": "Opponent left",
+    "matchOpponentLeftDetail": "Your opponent left. Find another opponent or play against the computer.",
+    "matchedWith": "Matched with {name}"
   }
 }
