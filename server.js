@@ -4,18 +4,13 @@ const { Server } = require('socket.io');
 const path = require('path');
 const db = require('./db');
 
-const AUTO_ROOM_CODE = 'AUTO';
 const FLEET_SIZES = { 1: 5, 2: 4, 3: 3, 4: 3, 5: 2 };
-
-function envFlag(value) {
-  return ['1', 'true', 'yes', 'on'].includes(String(value || '').toLowerCase());
-}
 
 function makeCode() {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
 
-function createRoom(firstPlayer = null, name = '', auto = false) {
+function createRoom(firstPlayer = null, name = '', kind = 'private') {
   const room = {
     players: [],
     names: {},
@@ -23,7 +18,7 @@ function createRoom(firstPlayer = null, name = '', auto = false) {
     hits: {},
     ready: new Set(),
     turn: null,
-    auto,
+    kind,
   };
   if (firstPlayer) {
     room.players.push(firstPlayer);
@@ -72,83 +67,121 @@ function validateFleet(board) {
   return true;
 }
 
-function resetMatch(room) {
-  room.boards = {};
-  room.hits = {};
-  room.ready = new Set();
-  room.turn = null;
-}
-
-function createGameServer(options = {}) {
-  const autoLobby = options.autoLobby ?? envFlag(process.env.AUTO_LOBBY);
+function createGameServer() {
   const app = express();
   const server = http.createServer(app);
   const io = new Server(server);
   const rooms = {};
+  const waitingPlayers = [];
 
   app.use(express.static(path.join(__dirname, 'public')));
-  app.get('/api/config', (_req, res) => {
-    res.json({ autoLobby });
-  });
   app.get('/api/leaderboard', async (_req, res) => {
     const players = await db.getLeaderboard(20);
     res.json({ game: db.GAME, players });
   });
 
-  function leaveAutoLobby(socket) {
-    const room = rooms[AUTO_ROOM_CODE];
-    if (!room?.players.includes(socket.id)) return false;
-    room.players = room.players.filter(id => id !== socket.id);
-    delete room.names[socket.id];
-    resetMatch(room);
-    socket.leave(AUTO_ROOM_CODE);
-    socket.data.roomCode = null;
-    io.to(AUTO_ROOM_CODE).emit('opponent_disconnected');
-    if (!room.players.length) {
-      delete rooms[AUTO_ROOM_CODE];
-    } else {
-      io.to(room.players[0]).emit('auto_lobby_assigned', {
-        playerNumber: 1,
-        waiting: true,
-        code: AUTO_ROOM_CODE,
-      });
-    }
+  function uniqueCode() {
+    let code = makeCode();
+    while (rooms[code]) code = makeCode();
+    return code;
+  }
+
+  function updateQueuePositions() {
+    waitingPlayers.forEach((player, index) => {
+      io.to(player.socketId).emit('matchmaking_waiting', { position: index + 1 });
+    });
+  }
+
+  function removeFromQueue(socketId) {
+    const index = waitingPlayers.findIndex(player => player.socketId === socketId);
+    if (index < 0) return false;
+    waitingPlayers.splice(index, 1);
+    updateQueuePositions();
     return true;
   }
 
-  io.on('connection', (socket) => {
-    socket.on('auto_lobby_join', (payload = {}) => {
-      if (!autoLobby) return socket.emit('auto_lobby_unavailable');
-      const existing = rooms[AUTO_ROOM_CODE];
-      if (existing?.players.includes(socket.id)) {
-        return socket.emit('auto_lobby_assigned', {
-          playerNumber: existing.players.indexOf(socket.id) + 1,
-          waiting: existing.players.length < 2,
-          code: AUTO_ROOM_CODE,
-        });
-      }
-      const room = existing || (rooms[AUTO_ROOM_CODE] = createRoom(null, '', true));
-      if (room.players.length >= 2) return socket.emit('lobby_full');
+  function leaveRoom(socket, notifyOpponent = true) {
+    const code = socket.data.roomCode;
+    const room = rooms[code];
+    if (!room || !room.players.includes(socket.id)) {
+      socket.data.roomCode = null;
+      return false;
+    }
 
+    const opponentId = room.players.find(id => id !== socket.id);
+    socket.leave(code);
+    socket.data.roomCode = null;
+    if (opponentId) {
+      const opponent = io.sockets.sockets.get(opponentId);
+      if (opponent) {
+        opponent.data.roomCode = null;
+        opponent.leave(code);
+      }
+      if (notifyOpponent) io.to(opponentId).emit('opponent_disconnected');
+    }
+    delete rooms[code];
+    return true;
+  }
+
+  function pairWithNextWaiting(socket, name) {
+    while (waitingPlayers.length) {
+      const candidate = waitingPlayers.shift();
+      const opponent = io.sockets.sockets.get(candidate.socketId);
+      if (!opponent || opponent.data.roomCode) continue;
+
+      const code = uniqueCode();
+      const room = createRoom(opponent.id, candidate.name, 'matchmaking');
       room.players.push(socket.id);
-      room.names[socket.id] = db.cleanName(payload.name);
-      socket.data.roomCode = AUTO_ROOM_CODE;
-      socket.join(AUTO_ROOM_CODE);
-      socket.emit('auto_lobby_assigned', {
-        playerNumber: room.players.length,
-        waiting: room.players.length < 2,
-        code: AUTO_ROOM_CODE,
+      room.names[socket.id] = name;
+      rooms[code] = room;
+
+      opponent.data.roomCode = code;
+      socket.data.roomCode = code;
+      opponent.join(code);
+      socket.join(code);
+      opponent.emit('match_found', {
+        code,
+        playerNumber: 1,
+        opponentName: room.names[socket.id],
       });
-      if (room.players.length === 2) io.to(AUTO_ROOM_CODE).emit('opponent_joined');
+      socket.emit('match_found', {
+        code,
+        playerNumber: 2,
+        opponentName: room.names[opponent.id],
+      });
+      updateQueuePositions();
+      return true;
+    }
+    return false;
+  }
+
+  io.on('connection', (socket) => {
+    socket.on('matchmaking_join', (payload = {}) => {
+      if (socket.data.roomCode) return socket.emit('matchmaking_error', 'Already in a game');
+      const existingIndex = waitingPlayers.findIndex(player => player.socketId === socket.id);
+      if (existingIndex >= 0) {
+        return socket.emit('matchmaking_waiting', { position: existingIndex + 1 });
+      }
+
+      const name = db.cleanName(payload.name);
+      if (pairWithNextWaiting(socket, name)) return;
+      waitingPlayers.push({ socketId: socket.id, name, joinedAt: Date.now() });
+      updateQueuePositions();
     });
 
-    socket.on('auto_lobby_leave', () => {
-      leaveAutoLobby(socket);
+    socket.on('matchmaking_cancel', () => {
+      if (removeFromQueue(socket.id)) socket.emit('matchmaking_cancelled');
+    });
+
+    socket.on('leave_game', () => {
+      removeFromQueue(socket.id);
+      leaveRoom(socket);
     });
 
     socket.on('create_room', (payload = {}) => {
-      let code = makeCode();
-      while (rooms[code]) code = makeCode();
+      if (socket.data.roomCode) return socket.emit('join_error', 'Already in a game');
+      removeFromQueue(socket.id);
+      const code = uniqueCode();
       rooms[code] = createRoom(socket.id, payload.name);
       socket.data.roomCode = code;
       socket.join(code);
@@ -156,9 +189,11 @@ function createGameServer(options = {}) {
     });
 
     socket.on('join_room', ({ code, name } = {}) => {
+      if (socket.data.roomCode) return socket.emit('join_error', 'Already in a game');
+      removeFromQueue(socket.id);
       const normalized = typeof code === 'string' ? code.toUpperCase() : '';
       const room = rooms[normalized];
-      if (!room || room.auto) return socket.emit('join_error', 'Room not found');
+      if (!room || room.kind !== 'private') return socket.emit('join_error', 'Room not found');
       if (room.players.length >= 2) return socket.emit('join_error', 'Room is full');
       room.players.push(socket.id);
       room.names[socket.id] = db.cleanName(name);
@@ -216,25 +251,24 @@ function createGameServer(options = {}) {
 
       if (won) {
         db.recordMatch(room.names[socket.id], room.names[opponentId], room.names[socket.id]);
-        if (room.auto) resetMatch(room);
-        else delete rooms[code];
+        for (const playerId of room.players) {
+          const player = io.sockets.sockets.get(playerId);
+          if (player) {
+            player.data.roomCode = null;
+            player.leave(code);
+          }
+        }
+        delete rooms[code];
       }
     });
 
     socket.on('disconnect', () => {
-      const code = socket.data.roomCode;
-      const room = rooms[code];
-      if (!room || !room.players.includes(socket.id)) return;
-      if (!room.auto) {
-        io.to(code).emit('opponent_disconnected');
-        delete rooms[code];
-        return;
-      }
-      leaveAutoLobby(socket);
+      if (removeFromQueue(socket.id)) return;
+      leaveRoom(socket);
     });
   });
 
-  return { app, server, io, rooms, autoLobby };
+  return { app, server, io, rooms, waitingPlayers };
 }
 
 if (require.main === module) {
@@ -244,7 +278,6 @@ if (require.main === module) {
 }
 
 module.exports = {
-  AUTO_ROOM_CODE,
   createGameServer,
   validateFleet,
   validCoordinate,

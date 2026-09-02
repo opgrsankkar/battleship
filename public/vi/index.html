@@ -62,7 +62,7 @@
       "name": "Tôi có thể chơi Hải chiến online với bạn bè không?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Có. Chọn Nhiều người chơi, tạo phòng và chia sẻ mã phòng hoặc liên kết. Bạn có thể đấu trực tiếp với nhau trong thời gian thực."
+        "text": "Có. Dùng Đấu nhanh để tìm đối thủ hoặc tạo Phòng riêng rồi chia sẻ mã hay liên kết với bạn bè. Bạn có thể đấu trực tiếp trong thời gian thực."
       }
     },
     {
@@ -127,9 +127,11 @@
       <div class="logo-icon">⚓</div>
       <h1>HẢI CHIẾN</h1>
     </div>
+    <input id="name-input" class="menu-name-input" type="text" placeholder="Biệt danh của bạn" maxlength="24">
     <div class="menu-buttons">
-      <button class="btn btn-primary" onclick="startSinglePlayer()">Đấu với máy</button>
-      <button class="btn btn-secondary" onclick="showScreen('screen-mp-menu')">Nhiều người chơi</button>
+      <button class="btn btn-primary" onclick="startQuickMatch()">Đấu nhanh</button>
+      <button class="btn btn-secondary" onclick="startSinglePlayer()">Đấu với máy</button>
+      <button class="btn btn-ghost" onclick="showScreen('screen-mp-menu')">Phòng riêng</button>
     </div>
     <div class="leaderboard-box">
       <h3>🏆 Bảng xếp hạng</h3>
@@ -140,15 +142,20 @@
     </div>
   </div>
 
-  <!-- Automatic local lobby -->
-  <div id="screen-auto-lobby" class="screen">
-    <h2>Phòng cục bộ</h2>
-    <div class="auto-lobby-card">
-      <div class="auto-player-badge" id="auto-player-badge">Connecting…</div>
-      <p id="auto-lobby-status">Joining the local lobby…</p>
-      <div id="auto-overflow-actions" class="auto-lobby-actions hidden">
-        <button class="btn btn-primary" onclick="startOverflowAI()">Đấu với máy</button>
-        <button class="btn btn-ghost" onclick="retryAutoLobby()">Thử lại phòng chờ</button>
+  <!-- Quick Match -->
+  <div id="screen-matchmaking" class="screen">
+    <h2>Đấu nhanh</h2>
+    <div class="matchmaking-card">
+      <div class="matchmaking-badge" id="matchmaking-badge">Searching…</div>
+      <p id="matchmaking-status">Waiting for an opponent…</p>
+      <div id="matchmaking-wait-actions" class="matchmaking-actions">
+        <button class="btn btn-secondary" onclick="startMatchmakingAI()">Đấu với máy</button>
+        <button class="btn btn-ghost" onclick="cancelQuickMatch()">Hủy</button>
+      </div>
+      <div id="matchmaking-disconnect-actions" class="matchmaking-actions hidden">
+        <button class="btn btn-primary" onclick="startQuickMatch()">Tìm đối thủ mới</button>
+        <button class="btn btn-secondary" onclick="startMatchmakingAI()">Đấu với máy</button>
+        <button class="btn btn-ghost" onclick="cancelQuickMatch()">Menu chính</button>
       </div>
     </div>
   </div>
@@ -157,7 +164,6 @@
   <div id="screen-mp-menu" class="screen">
     <h2>Nhiều người chơi</h2>
     <div class="menu-buttons">
-      <input id="name-input" type="text" placeholder="Biệt danh của bạn" maxlength="24" style="text-align:center;">
       <button class="btn btn-primary" onclick="createRoom()">Tạo phòng</button>
       <div class="join-row">
         <input id="room-input" type="text" placeholder="Mã phòng" maxlength="6">
@@ -188,6 +194,7 @@
   <!-- Ship Placement -->
   <div id="screen-placement" class="screen">
     <h2>Sắp xếp tàu</h2>
+    <p id="match-info" class="match-info hidden"></p>
     <p style="font-size:.82rem;color:#94a3b8;text-align:center;margin:-.25rem 0 .75rem;line-height:1.5;">
       Kéo tàu vào lưới hoặc nhấp để đặt. Kéo một tàu đã đặt để di chuyển. Nhấn R hoặc chạm đúp vào tàu đã chọn để xoay, sau đó nhấn Sẵn sàng!
     </p>
@@ -286,7 +293,7 @@
       <p>Hải chiến Online là phiên bản miễn phí trên trình duyệt của trò chơi chiến thuật hải quân cổ điển. Giấu hạm đội của bạn trên lưới 10×10, sau đó thay phiên nhau bắn vào các tàu đang ẩn nấp của đối phương cho đến khi một hạm đội bị đánh chìm hoàn toàn. Chơi đơn với AI thông minh hoặc thách đấu bạn bè trong chế độ 2 người chơi trực tuyến thời gian thực — không cần tải về, không cần đăng ký và không có quảng cáo. Chạy mượt mà trên cả máy tính và điện thoại.</p>
       <h3 class="seo-h">Cách chơi Hải chiến Online</h3>
       <ol class="seo-list">
-        <li>Chọn một chế độ — đấu với máy (Dễ, Trung bình hoặc Khó) hoặc tạo phòng để chơi cùng bạn bè.</li>
+        <li>Chọn một chế độ — dùng Đấu nhanh để tìm đối thủ, đấu với máy (Dễ, Trung bình hoặc Khó) hoặc tạo Phòng riêng cho bạn bè.</li>
         <li>Sắp xếp hạm đội — đặt năm con tàu của bạn lên lưới. Nhấn Xoay (R) để lật tàu, hoặc nhấn Ngẫu nhiên để tự động sắp xếp.</li>
         <li>Thay phiên nhau bắn — nhấp vào một ô trên lưới của đối thủ để khai hỏa. Phát bắn trúng được đánh dấu màu đỏ, bắn trượt màu xám.</li>
         <li>Đánh chìm mọi con tàu — đô đốc đầu tiên đánh chìm toàn bộ hạm đội địch sẽ giành chiến thắng.</li>
@@ -294,7 +301,7 @@
       <h3 class="seo-h">Tính năng trò chơi</h3>
       <ul class="seo-list">
         <li>Chế độ chơi đơn với AI có ba mức độ khó — từ bắn ngẫu nhiên đến săn lùng dựa trên xác suất.</li>
-        <li>Chế độ 2 người chơi trực tuyến — tạo phòng và chia sẻ mã hoặc liên kết để đấu với bạn bè trong thời gian thực.</li>
+        <li>Chế độ 2 người chơi trực tuyến — tìm đối thủ bằng Đấu nhanh hoặc tạo và chia sẻ Phòng riêng để đấu với bạn bè trong thời gian thực.</li>
         <li>Miễn phí và tức thì — không cần tài khoản, không cần cài đặt, không cần tải về.</li>
         <li>Chơi mọi nơi — hoạt động trên mọi trình duyệt hiện đại trên máy tính, điện thoại hoặc máy tính bảng.</li>
       </ul>
@@ -303,7 +310,7 @@
         <h4>Hải chiến Online có miễn phí không?</h4>
         <p>Có. Trò chơi hoàn toàn miễn phí, không cần đăng ký, không quảng cáo và không cần tải về — chỉ cần mở trang web và chơi.</p>
         <h4>Tôi có thể chơi Hải chiến online với bạn bè không?</h4>
-        <p>Có. Chọn Nhiều người chơi, tạo phòng và chia sẻ mã phòng hoặc liên kết. Bạn có thể đấu trực tiếp với nhau trong thời gian thực.</p>
+        <p>Có. Dùng Đấu nhanh để tìm đối thủ hoặc tạo Phòng riêng rồi chia sẻ mã hay liên kết với bạn bè. Bạn có thể đấu trực tiếp trong thời gian thực.</p>
         <h4>Tôi có cần tải hay cài đặt gì không?</h4>
         <p>Không. Hải chiến Online chạy hoàn toàn trên trình duyệt web, vì vậy không cần tải hay cài đặt bất cứ thứ gì trên máy tính hay điện thoại.</p>
         <h4>Tôi có thể chơi Hải chiến với máy không?</h4>
@@ -329,7 +336,7 @@
   <script src="/placement.js"></script>
   <!-- i18n:runtime:start -->
 <script>
-window.__I18N__ = {"ships":{"1":"Tàu sân bay","2":"Thiết giáp hạm","3":"Tàu tuần dương","4":"Tàu ngầm","5":"Tàu khu trục"},"yourTurn":"Lượt của bạn","oppTurn":"Lượt của đối thủ","victory":"CHIẾN THẮNG!","defeat":"THẤT BẠI","wonSub":"Bạn đã đánh chìm tất cả tàu địch!","lostSub":"Hạm đội của bạn đã bị tiêu diệt.","copied":"Đã sao chép!","copyCode":"Sao chép mã","copyLink":"Sao chép liên kết","joiningRoom":"Đang tham gia phòng {code}…","waitingJoin":"Đang chờ đối thủ tham gia…","oppReady":"Đối thủ đã sẵn sàng!","oppDisconnected":"Đối thủ đã ngắt kết nối.","youSunkTheir":"Bạn đã đánh chìm {ship} của đối phương!","theySunkYour":"Đối phương đã đánh chìm {ship} của bạn!","youHit":"Bạn bắn trúng {cell}","youMissed":"Bạn bắn trượt {cell}","oppHit":"Đối thủ bắn trúng {cell}","oppMissed":"Đối thủ bắn trượt {cell}","autoConnecting":"Đang tham gia phòng cục bộ…","autoAssigned":"Bạn là Người chơi {player}.","autoWaiting":"Đang chờ Người chơi 2…","autoFullBadge":"Phòng đã đầy","autoFull":"Phòng cục bộ đã đầy. Bạn có thể bắt đầu một ván riêng với máy.","autoOpponentLeft":"Đối thủ đã rời đi. Đang chờ người chơi khác…"};
+window.__I18N__ = {"ships":{"1":"Tàu sân bay","2":"Thiết giáp hạm","3":"Tàu tuần dương","4":"Tàu ngầm","5":"Tàu khu trục"},"yourTurn":"Lượt của bạn","oppTurn":"Lượt của đối thủ","victory":"CHIẾN THẮNG!","defeat":"THẤT BẠI","wonSub":"Bạn đã đánh chìm tất cả tàu địch!","lostSub":"Hạm đội của bạn đã bị tiêu diệt.","copied":"Đã sao chép!","copyCode":"Sao chép mã","copyLink":"Sao chép liên kết","joiningRoom":"Đang tham gia phòng {code}…","waitingJoin":"Đang chờ đối thủ tham gia…","oppReady":"Đối thủ đã sẵn sàng!","oppDisconnected":"Đối thủ đã ngắt kết nối.","youSunkTheir":"Bạn đã đánh chìm {ship} của đối phương!","theySunkYour":"Đối phương đã đánh chìm {ship} của bạn!","youHit":"Bạn bắn trúng {cell}","youMissed":"Bạn bắn trượt {cell}","oppHit":"Đối thủ bắn trúng {cell}","oppMissed":"Đối thủ bắn trượt {cell}","matchSearching":"Đang tìm…","matchWaiting":"Đang tìm đối thủ…","matchWaitingPosition":"Đang chờ đối thủ… Vị trí hàng đợi: {position}.","matchError":"Lỗi ghép trận","matchOpponentLeft":"Đối thủ đã rời đi","matchOpponentLeftDetail":"Đối thủ đã rời đi. Hãy tìm đối thủ mới hoặc đấu với máy.","matchedWith":"Đã ghép với {name}"};
 window.t = function(k, p){ var d = window.__I18N__ || {}; var s = String(k).split('.').reduce(function(o,i){return (o==null)?undefined:o[i];}, d); if (s == null) s = k; if (p) for (var n in p) s = s.split('{'+n+'}').join(p[n]); return s; };
 </script>
 <!-- i18n:runtime:end -->

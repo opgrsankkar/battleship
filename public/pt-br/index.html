@@ -62,7 +62,7 @@
       "name": "Posso jogar Batalha Naval online com um amigo?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Sim. Escolha Multijogador, crie uma sala e compartilhe o código ou link da sala. Vocês jogam uma partida ao vivo para 2 jogadores em tempo real."
+        "text": "Sim. Use Partida rápida para encontrar um oponente ou crie uma Sala privada e compartilhe o código ou link com um amigo. Vocês jogam uma partida para 2 jogadores em tempo real."
       }
     },
     {
@@ -127,9 +127,11 @@
       <div class="logo-icon">⚓</div>
       <h1>BATALHA NAVAL</h1>
     </div>
+    <input id="name-input" class="menu-name-input" type="text" placeholder="Seu apelido" maxlength="24">
     <div class="menu-buttons">
-      <button class="btn btn-primary" onclick="startSinglePlayer()">VS Computador</button>
-      <button class="btn btn-secondary" onclick="showScreen('screen-mp-menu')">Multijogador</button>
+      <button class="btn btn-primary" onclick="startQuickMatch()">Partida rápida</button>
+      <button class="btn btn-secondary" onclick="startSinglePlayer()">VS Computador</button>
+      <button class="btn btn-ghost" onclick="showScreen('screen-mp-menu')">Sala privada</button>
     </div>
     <div class="leaderboard-box">
       <h3>🏆 Ranking</h3>
@@ -140,15 +142,20 @@
     </div>
   </div>
 
-  <!-- Automatic local lobby -->
-  <div id="screen-auto-lobby" class="screen">
-    <h2>Sala local</h2>
-    <div class="auto-lobby-card">
-      <div class="auto-player-badge" id="auto-player-badge">Connecting…</div>
-      <p id="auto-lobby-status">Joining the local lobby…</p>
-      <div id="auto-overflow-actions" class="auto-lobby-actions hidden">
-        <button class="btn btn-primary" onclick="startOverflowAI()">Jogar contra o computador</button>
-        <button class="btn btn-ghost" onclick="retryAutoLobby()">Tentar sala novamente</button>
+  <!-- Quick Match -->
+  <div id="screen-matchmaking" class="screen">
+    <h2>Partida rápida</h2>
+    <div class="matchmaking-card">
+      <div class="matchmaking-badge" id="matchmaking-badge">Searching…</div>
+      <p id="matchmaking-status">Waiting for an opponent…</p>
+      <div id="matchmaking-wait-actions" class="matchmaking-actions">
+        <button class="btn btn-secondary" onclick="startMatchmakingAI()">VS Computador</button>
+        <button class="btn btn-ghost" onclick="cancelQuickMatch()">Cancelar</button>
+      </div>
+      <div id="matchmaking-disconnect-actions" class="matchmaking-actions hidden">
+        <button class="btn btn-primary" onclick="startQuickMatch()">Encontrar novo oponente</button>
+        <button class="btn btn-secondary" onclick="startMatchmakingAI()">VS Computador</button>
+        <button class="btn btn-ghost" onclick="cancelQuickMatch()">Menu Principal</button>
       </div>
     </div>
   </div>
@@ -157,7 +164,6 @@
   <div id="screen-mp-menu" class="screen">
     <h2>Multijogador</h2>
     <div class="menu-buttons">
-      <input id="name-input" type="text" placeholder="Seu apelido" maxlength="24" style="text-align:center;">
       <button class="btn btn-primary" onclick="createRoom()">Criar Sala</button>
       <div class="join-row">
         <input id="room-input" type="text" placeholder="Código da sala" maxlength="6">
@@ -188,6 +194,7 @@
   <!-- Ship Placement -->
   <div id="screen-placement" class="screen">
     <h2>Posicione seus Navios</h2>
+    <p id="match-info" class="match-info hidden"></p>
     <p style="font-size:.82rem;color:#94a3b8;text-align:center;margin:-.25rem 0 .75rem;line-height:1.5;">
       Arraste os navios para a grade ou clique para posicioná-los. Arraste um navio posicionado para movê-lo. Pressione R ou toque duas vezes em um navio selecionado para girá-lo e depois clique em Pronto!
     </p>
@@ -286,7 +293,7 @@
       <p>Batalha Naval Online é uma versão gratuita para navegador do clássico jogo de estratégia naval. Esconda sua frota em uma grade 10×10 e reveze os tiros nos navios escondidos do seu oponente até que uma frota seja afundada. Jogue sozinho contra uma IA inteligente ou desafie um amigo para o modo multijogador online em tempo real — sem download, sem cadastro e sem anúncios. Funciona instantaneamente no desktop e no celular.</p>
       <h3 class="seo-h">Como Jogar Batalha Naval Online</h3>
       <ol class="seo-list">
-        <li>Escolha um modo — lute contra o computador (Fácil, Médio ou Difícil) ou crie uma sala multijogador para jogar com um amigo.</li>
+        <li>Escolha um modo — use Partida rápida para encontrar um oponente, lute contra o computador (Fácil, Médio ou Difícil) ou crie uma Sala privada para um amigo.</li>
         <li>Posicione sua frota — coloque seus cinco navios na grade. Pressione Girar (R) para virar um navio ou clique em Aleatório para um layout instantâneo.</li>
         <li>Revezem os tiros — clique em um quadrado na grade do seu oponente para atirar. Um acerto é marcado em vermelho, um erro em cinza.</li>
         <li>Afunde todos os navios — o primeiro almirante a afundar toda a frota inimiga vence a batalha.</li>
@@ -294,7 +301,7 @@
       <h3 class="seo-h">Recursos do Jogo</h3>
       <ul class="seo-list">
         <li>Um jogador vs IA com três níveis de dificuldade — de tiros aleatórios a caça baseada em probabilidade.</li>
-        <li>Multijogador online para 2 jogadores — crie uma sala e compartilhe o código ou link para jogar com um amigo em tempo real.</li>
+        <li>Multijogador online para 2 jogadores — encontre um oponente com Partida rápida ou crie e compartilhe uma Sala privada para jogar com um amigo em tempo real.</li>
         <li>Grátis e instantâneo — sem conta, sem instalação, sem necessidade de download.</li>
         <li>Jogue em qualquer lugar — funciona em qualquer navegador moderno no desktop, celular ou tablet.</li>
       </ul>
@@ -303,7 +310,7 @@
         <h4>O Batalha Naval Online é gratuito?</h4>
         <p>Sim. É totalmente gratuito, sem cadastro, sem anúncios e sem necessidade de download — basta abrir a página e jogar.</p>
         <h4>Posso jogar Batalha Naval online com um amigo?</h4>
-        <p>Sim. Escolha Multijogador, crie uma sala e compartilhe o código ou link da sala. Vocês jogam uma partida ao vivo para 2 jogadores em tempo real.</p>
+        <p>Sim. Use Partida rápida para encontrar um oponente ou crie uma Sala privada e compartilhe o código ou link com um amigo. Vocês jogam uma partida para 2 jogadores em tempo real.</p>
         <h4>Preciso baixar ou instalar algo?</h4>
         <p>Não. O Batalha Naval Online roda inteiramente no seu navegador, então não há nada para baixar ou instalar no desktop ou celular.</p>
         <h4>Posso jogar Batalha Naval contra o computador?</h4>
@@ -329,7 +336,7 @@
   <script src="/placement.js"></script>
   <!-- i18n:runtime:start -->
 <script>
-window.__I18N__ = {"ships":{"1":"Porta-aviões","2":"Encouraçado","3":"Cruzador","4":"Submarino","5":"Contratorpedeiro"},"yourTurn":"Sua Vez","oppTurn":"Vez do Oponente","victory":"VITÓRIA!","defeat":"DERROTA","wonSub":"Você afundou todos os navios inimigos!","lostSub":"Sua frota foi destruída.","copied":"Copiado!","copyCode":"Copiar Código","copyLink":"Copiar Link","joiningRoom":"Entrando na sala {code}…","waitingJoin":"Aguardando oponente entrar…","oppReady":"Oponente está pronto!","oppDisconnected":"Oponente desconectado.","youSunkTheir":"Você afundou o {ship} deles!","theySunkYour":"Eles afundaram seu {ship}!","youHit":"Você acertou {cell}","youMissed":"Você errou {cell}","oppHit":"Oponente acertou {cell}","oppMissed":"Oponente errou {cell}","autoConnecting":"Entrando na sala local…","autoAssigned":"Você é o Jogador {player}.","autoWaiting":"Aguardando o Jogador 2…","autoFullBadge":"Sala cheia","autoFull":"A sala local está cheia. Você pode iniciar uma partida privada contra o computador.","autoOpponentLeft":"Seu oponente saiu. Aguardando outro jogador…"};
+window.__I18N__ = {"ships":{"1":"Porta-aviões","2":"Encouraçado","3":"Cruzador","4":"Submarino","5":"Contratorpedeiro"},"yourTurn":"Sua Vez","oppTurn":"Vez do Oponente","victory":"VITÓRIA!","defeat":"DERROTA","wonSub":"Você afundou todos os navios inimigos!","lostSub":"Sua frota foi destruída.","copied":"Copiado!","copyCode":"Copiar Código","copyLink":"Copiar Link","joiningRoom":"Entrando na sala {code}…","waitingJoin":"Aguardando oponente entrar…","oppReady":"Oponente está pronto!","oppDisconnected":"Oponente desconectado.","youSunkTheir":"Você afundou o {ship} deles!","theySunkYour":"Eles afundaram seu {ship}!","youHit":"Você acertou {cell}","youMissed":"Você errou {cell}","oppHit":"Oponente acertou {cell}","oppMissed":"Oponente errou {cell}","matchSearching":"Procurando…","matchWaiting":"Procurando um oponente…","matchWaitingPosition":"Aguardando um oponente… Posição na fila: {position}.","matchError":"Erro de pareamento","matchOpponentLeft":"O oponente saiu","matchOpponentLeftDetail":"Seu oponente saiu. Encontre outro ou jogue contra o computador.","matchedWith":"Você enfrentará {name}"};
 window.t = function(k, p){ var d = window.__I18N__ || {}; var s = String(k).split('.').reduce(function(o,i){return (o==null)?undefined:o[i];}, d); if (s == null) s = k; if (p) for (var n in p) s = s.split('{'+n+'}').join(p[n]); return s; };
 </script>
 <!-- i18n:runtime:end -->

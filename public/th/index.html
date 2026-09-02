@@ -62,7 +62,7 @@
       "name": "Can I play Battleship online with a friend?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "ได้ เลือกโหมดเล่นหลายคน สร้างห้อง และแชร์รหัสห้องหรือลิงก์ คุณสามารถเล่นเกมแบบ 2 คนแบบเรียลไทม์ด้วยกันได้"
+        "text": "ได้ ใช้จับคู่ด่วนเพื่อหาคู่ต่อสู้ หรือสร้างห้องส่วนตัวแล้วแชร์รหัสหรือลิงก์กับเพื่อน คุณสามารถเล่นแบบ 2 คนแบบเรียลไทม์ได้"
       }
     },
     {
@@ -127,9 +127,11 @@
       <div class="logo-icon">⚓</div>
       <h1>เกมเรือรบ</h1>
     </div>
+    <input id="name-input" class="menu-name-input" type="text" placeholder="ชื่อเล่นของคุณ" maxlength="24">
     <div class="menu-buttons">
-      <button class="btn btn-primary" onclick="startSinglePlayer()">แข่งกับคอมพิวเตอร์</button>
-      <button class="btn btn-secondary" onclick="showScreen('screen-mp-menu')">เล่นหลายคน</button>
+      <button class="btn btn-primary" onclick="startQuickMatch()">จับคู่ด่วน</button>
+      <button class="btn btn-secondary" onclick="startSinglePlayer()">แข่งกับคอมพิวเตอร์</button>
+      <button class="btn btn-ghost" onclick="showScreen('screen-mp-menu')">ห้องส่วนตัว</button>
     </div>
     <div class="leaderboard-box">
       <h3>🏆 ตารางคะแนน</h3>
@@ -140,15 +142,20 @@
     </div>
   </div>
 
-  <!-- Automatic local lobby -->
-  <div id="screen-auto-lobby" class="screen">
-    <h2>ล็อบบี้ภายใน</h2>
-    <div class="auto-lobby-card">
-      <div class="auto-player-badge" id="auto-player-badge">Connecting…</div>
-      <p id="auto-lobby-status">Joining the local lobby…</p>
-      <div id="auto-overflow-actions" class="auto-lobby-actions hidden">
-        <button class="btn btn-primary" onclick="startOverflowAI()">เล่นกับคอมพิวเตอร์</button>
-        <button class="btn btn-ghost" onclick="retryAutoLobby()">ลองเข้าล็อบบี้อีกครั้ง</button>
+  <!-- Quick Match -->
+  <div id="screen-matchmaking" class="screen">
+    <h2>จับคู่ด่วน</h2>
+    <div class="matchmaking-card">
+      <div class="matchmaking-badge" id="matchmaking-badge">Searching…</div>
+      <p id="matchmaking-status">Waiting for an opponent…</p>
+      <div id="matchmaking-wait-actions" class="matchmaking-actions">
+        <button class="btn btn-secondary" onclick="startMatchmakingAI()">แข่งกับคอมพิวเตอร์</button>
+        <button class="btn btn-ghost" onclick="cancelQuickMatch()">ยกเลิก</button>
+      </div>
+      <div id="matchmaking-disconnect-actions" class="matchmaking-actions hidden">
+        <button class="btn btn-primary" onclick="startQuickMatch()">หาคู่ต่อสู้ใหม่</button>
+        <button class="btn btn-secondary" onclick="startMatchmakingAI()">แข่งกับคอมพิวเตอร์</button>
+        <button class="btn btn-ghost" onclick="cancelQuickMatch()">เมนูหลัก</button>
       </div>
     </div>
   </div>
@@ -157,7 +164,6 @@
   <div id="screen-mp-menu" class="screen">
     <h2>เล่นหลายคน</h2>
     <div class="menu-buttons">
-      <input id="name-input" type="text" placeholder="ชื่อเล่นของคุณ" maxlength="24" style="text-align:center;">
       <button class="btn btn-primary" onclick="createRoom()">สร้างห้อง</button>
       <div class="join-row">
         <input id="room-input" type="text" placeholder="รหัสห้อง" maxlength="6">
@@ -188,6 +194,7 @@
   <!-- Ship Placement -->
   <div id="screen-placement" class="screen">
     <h2>วางเรือของคุณ</h2>
+    <p id="match-info" class="match-info hidden"></p>
     <p style="font-size:.82rem;color:#94a3b8;text-align:center;margin:-.25rem 0 .75rem;line-height:1.5;">
       ลากเรือลงบนตารางหรือคลิกเพื่อวาง ลากเรือที่วางแล้วเพื่อย้าย กด R หรือแตะเรือที่เลือกสองครั้งเพื่อหมุน แล้วกด 'พร้อม!'
     </p>
@@ -286,7 +293,7 @@
       <p>เกมเรือรบออนไลน์เป็นเวอร์ชันเล่นบนเบราว์เซอร์ฟรีของเกมวางแผนการรบทางเรือสุดคลาสสิก ซ่อนกองเรือของคุณบนตารางขนาด 10×10 แล้วผลัดกันยิงใส่เรือที่ซ่อนอยู่ของคู่ต่อสู้จนกว่ากองเรือฝ่ายใดฝ่ายหนึ่งจะจมลง เล่นคนเดียวแข่งกับ AI ที่ชาญฉลาด หรือท้าทายเพื่อนในโหมดเล่นหลายคนแบบเรียลไทม์ — ไม่ต้องดาวน์โหลด ไม่ต้องสมัครสมาชิก และไม่มีโฆษณา เล่นได้ทันทีทั้งบนคอมพิวเตอร์และมือถือ</p>
       <h3 class="seo-h">วิธีเล่นเกมเรือรบออนไลน์</h3>
       <ol class="seo-list">
-        <li>เลือกโหมด — ต่อสู้กับคอมพิวเตอร์ (ง่าย, ปานกลาง หรือยาก) หรือสร้างห้องเล่นหลายคนเพื่อเล่นกับเพื่อน</li>
+        <li>เลือกโหมด — ใช้จับคู่ด่วนเพื่อหาคู่ต่อสู้ แข่งกับคอมพิวเตอร์ (ง่าย ปานกลาง หรือยาก) หรือสร้างห้องส่วนตัวสำหรับเพื่อน</li>
         <li>วางกองเรือของคุณ — จัดวางเรือทั้ง 5 ลำบนตาราง กดหมุน (R) เพื่อกลับด้านเรือ หรือกดสุ่มเพื่อจัดวางทันที</li>
         <li>ผลัดกันยิง — คลิกที่ช่องบนตารางของคู่ต่อสู้เพื่อยิง หากโดนจะทำเครื่องหมายสีแดง หากพลาดจะเป็นสีเทา</li>
         <li>จมเรือทุกลำ — ผู้บัญชาการคนแรกที่จมกองเรือศัตรูได้ทั้งหมดจะเป็นผู้ชนะ</li>
@@ -294,7 +301,7 @@
       <h3 class="seo-h">คุณสมบัติของเกม</h3>
       <ul class="seo-list">
         <li>เล่นคนเดียวแข่งกับ AI ที่มีระดับความยาก 3 ระดับ — ตั้งแต่การยิงสุ่มไปจนถึงการล่าตามความน่าจะเป็น</li>
-        <li>เล่นหลายคนออนไลน์ 2 คน — สร้างห้องและแชร์รหัสหรือลิงก์เพื่อเล่นกับเพื่อนแบบเรียลไทม์</li>
+        <li>เล่นหลายคนออนไลน์ 2 คน — หาคู่ต่อสู้ด้วยจับคู่ด่วน หรือสร้างและแชร์ห้องส่วนตัวเพื่อเล่นกับเพื่อนแบบเรียลไทม์</li>
         <li>ฟรีและเล่นได้ทันที — ไม่ต้องมีบัญชี ไม่ต้องติดตั้ง ไม่ต้องดาวน์โหลด</li>
         <li>เล่นได้ทุกที่ — ใช้งานได้บนเบราว์เซอร์สมัยใหม่ทุกรุ่น ทั้งบนคอมพิวเตอร์ โทรศัพท์ หรือแท็บเล็ต</li>
       </ul>
@@ -303,7 +310,7 @@
         <h4>Is Battleship Online free to play?</h4>
         <p>ใช่ เล่นฟรีทั้งหมดโดยไม่ต้องสมัครสมาชิก ไม่มีโฆษณา และไม่ต้องดาวน์โหลด เพียงแค่เปิดหน้าเว็บก็เล่นได้เลย</p>
         <h4>Can I play Battleship online with a friend?</h4>
-        <p>ได้ เลือกโหมดเล่นหลายคน สร้างห้อง และแชร์รหัสห้องหรือลิงก์ คุณสามารถเล่นเกมแบบ 2 คนแบบเรียลไทม์ด้วยกันได้</p>
+        <p>ได้ ใช้จับคู่ด่วนเพื่อหาคู่ต่อสู้ หรือสร้างห้องส่วนตัวแล้วแชร์รหัสหรือลิงก์กับเพื่อน คุณสามารถเล่นแบบ 2 คนแบบเรียลไทม์ได้</p>
         <h4>Do I need to download or install anything?</h4>
         <p>ไม่ เกมเรือรบออนไลน์ทำงานบนเว็บเบราว์เซอร์ของคุณทั้งหมด จึงไม่ต้องดาวน์โหลดหรือติดตั้งอะไรเลยทั้งบนคอมพิวเตอร์และมือถือ</p>
         <h4>Can I play Battleship against the computer?</h4>
@@ -329,7 +336,7 @@
   <script src="/placement.js"></script>
   <!-- i18n:runtime:start -->
 <script>
-window.__I18N__ = {"ships":{"1":"เรือบรรทุกเครื่องบิน","2":"เรือประจัญบาน","3":"เรือลาดตระเวน","4":"เรือดำน้ำ","5":"เรือพิฆาต"},"yourTurn":"ตาของคุณ","oppTurn":"ตาของคู่ต่อสู้","victory":"ชัยชนะ!","defeat":"พ่ายแพ้","wonSub":"คุณจมเรือศัตรูได้ทุกลำ!","lostSub":"กองเรือของคุณถูกทำลายแล้ว","copied":"คัดลอกแล้ว!","copyCode":"คัดลอกรหัส","copyLink":"คัดลอกลิงก์","joiningRoom":"กำลังเข้าร่วมห้อง {code}…","waitingJoin":"กำลังรอคู่ต่อสู้เข้าร่วม…","oppReady":"คู่ต่อสู้พร้อมแล้ว!","oppDisconnected":"คู่ต่อสู้ตัดการเชื่อมต่อ","youSunkTheir":"คุณจม {ship} ของพวกเขาแล้ว!","theySunkYour":"พวกเขาจม {ship} ของคุณแล้ว!","youHit":"คุณยิงโดนที่ {cell}","youMissed":"คุณยิงพลาดที่ {cell}","oppHit":"คู่ต่อสู้ยิงโดนที่ {cell}","oppMissed":"คู่ต่อสู้ยิงพลาดที่ {cell}","autoConnecting":"กำลังเข้าร่วมล็อบบี้ภายใน…","autoAssigned":"คุณคือผู้เล่น {player}","autoWaiting":"กำลังรอผู้เล่น 2…","autoFullBadge":"ล็อบบี้เต็ม","autoFull":"ล็อบบี้ภายในเต็มแล้ว คุณสามารถเริ่มเกมส่วนตัวกับคอมพิวเตอร์ได้","autoOpponentLeft":"คู่ต่อสู้ของคุณออกไปแล้ว กำลังรอผู้เล่นคนใหม่…"};
+window.__I18N__ = {"ships":{"1":"เรือบรรทุกเครื่องบิน","2":"เรือประจัญบาน","3":"เรือลาดตระเวน","4":"เรือดำน้ำ","5":"เรือพิฆาต"},"yourTurn":"ตาของคุณ","oppTurn":"ตาของคู่ต่อสู้","victory":"ชัยชนะ!","defeat":"พ่ายแพ้","wonSub":"คุณจมเรือศัตรูได้ทุกลำ!","lostSub":"กองเรือของคุณถูกทำลายแล้ว","copied":"คัดลอกแล้ว!","copyCode":"คัดลอกรหัส","copyLink":"คัดลอกลิงก์","joiningRoom":"กำลังเข้าร่วมห้อง {code}…","waitingJoin":"กำลังรอคู่ต่อสู้เข้าร่วม…","oppReady":"คู่ต่อสู้พร้อมแล้ว!","oppDisconnected":"คู่ต่อสู้ตัดการเชื่อมต่อ","youSunkTheir":"คุณจม {ship} ของพวกเขาแล้ว!","theySunkYour":"พวกเขาจม {ship} ของคุณแล้ว!","youHit":"คุณยิงโดนที่ {cell}","youMissed":"คุณยิงพลาดที่ {cell}","oppHit":"คู่ต่อสู้ยิงโดนที่ {cell}","oppMissed":"คู่ต่อสู้ยิงพลาดที่ {cell}","matchSearching":"กำลังค้นหา…","matchWaiting":"กำลังค้นหาคู่ต่อสู้…","matchWaitingPosition":"กำลังรอคู่ต่อสู้… ลำดับคิว: {position}","matchError":"เกิดข้อผิดพลาดในการจับคู่","matchOpponentLeft":"คู่ต่อสู้ออกจากเกม","matchOpponentLeftDetail":"คู่ต่อสู้ออกจากเกม หาคู่ต่อสู้ใหม่หรือเล่นกับคอมพิวเตอร์ได้","matchedWith":"จับคู่กับ {name} แล้ว"};
 window.t = function(k, p){ var d = window.__I18N__ || {}; var s = String(k).split('.').reduce(function(o,i){return (o==null)?undefined:o[i];}, d); if (s == null) s = k; if (p) for (var n in p) s = s.split('{'+n+'}').join(p[n]); return s; };
 </script>
 <!-- i18n:runtime:end -->
