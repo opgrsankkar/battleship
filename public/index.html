@@ -206,6 +206,19 @@
         <div class="ship-status" id="opp-ships"></div>
       </div>
     </div>
+    <section id="result-panel" class="result-panel" aria-labelledby="result-title" aria-describedby="result-sub" hidden>
+      <div class="result-summary">
+        <div class="result-icon" id="result-icon"></div>
+        <div>
+          <h2 id="result-title"></h2>
+          <p id="result-sub"></p>
+        </div>
+      </div>
+      <div class="result-actions">
+        <button class="btn btn-primary" onclick="playAgain()">Play Again</button>
+        <button class="btn btn-ghost" onclick="hideResult(); showScreen('screen-menu')">Main Menu</button>
+      </div>
+    </section>
     <div class="game-boards">
       <div class="board-section">
         <h3>Your Fleet</h3>
@@ -235,17 +248,6 @@
       </div>
     </div>
     <div class="game-log" id="game-log"></div>
-  </div>
-
-  <!-- Result -->
-  <div id="screen-result" class="screen">
-    <div class="result-content">
-      <div class="result-icon" id="result-icon"></div>
-      <h2 id="result-title"></h2>
-      <p id="result-sub"></p>
-      <button class="btn btn-primary" onclick="playAgain()">Play Again</button>
-      <button class="btn btn-ghost" onclick="showScreen('screen-menu')">Main Menu</button>
-    </div>
   </div>
   </main>
 

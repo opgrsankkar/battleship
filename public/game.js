@@ -640,16 +640,28 @@ function getCell(boardId, r, c) {
 // ── Result ────────────────────────────────────────────────────────────────────
 function showResult(won) {
   state.gameOver = true;
+  updateTurnDisplay();
+  const resultTitle = won ? T('victory') : T('defeat');
+  const turnIndicator = document.getElementById('turn-indicator');
+  turnIndicator.textContent = resultTitle;
+  turnIndicator.classList.toggle('opponent-turn', !won);
   document.getElementById('result-icon').textContent = won ? '🏆' : '💥';
-  document.getElementById('result-title').textContent = won ? T('victory') : T('defeat');
+  document.getElementById('result-title').textContent = resultTitle;
   document.getElementById('result-sub').textContent = won
     ? T('wonSub')
     : T('lostSub');
   document.getElementById('result-title').style.color = won ? 'var(--accent)' : 'var(--danger)';
-  showScreen('screen-result');
+  const panel = document.getElementById('result-panel');
+  panel.hidden = false;
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function hideResult() {
+  document.getElementById('result-panel').hidden = true;
 }
 
 function playAgain() {
+  hideResult();
   if (state.mode === 'single') {
     initPlacement();
     showScreen('screen-difficulty');
