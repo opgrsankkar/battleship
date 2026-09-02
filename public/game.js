@@ -9,6 +9,8 @@ const SHIPS = [
   { id: 5, name: 'Destroyer',  size: 2 },
 ];
 const COLS = 'ABCDEFGHIJ';
+const DOUBLE_TAP_MS = 350;
+let lastShipTap = { shipId: null, at: 0 };
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let state = {
@@ -199,6 +201,7 @@ function initPlacement() {
   state.placedShips = new Set();
   state.selectedShip = null;
   state.horizontal = true;
+  lastShipTap = { shipId: null, at: 0 };
 
   buildShipList();
   buildBoard('place-board', onPlaceCellClick, onPlaceCellHover, onPlaceBoardLeave);
@@ -216,6 +219,7 @@ function buildShipList() {
     el.className = 'ship-item';
     el.id = `ship-item-${ship.id}`;
     el.onclick = () => selectShip(ship.id);
+    el.addEventListener('pointerup', e => handleShipPointerUp(e, ship.id));
     el.innerHTML = `
       <div class="ship-blocks">${'<div class="ship-block"></div>'.repeat(ship.size)}</div>
       <div><div class="ship-name">${ship.name}</div><div class="ship-len">${ship.size} cells</div></div>`;
@@ -229,16 +233,41 @@ function selectShip(id) {
   document.querySelectorAll('.ship-item').forEach(el => el.classList.remove('selected'));
   const el = document.getElementById(`ship-item-${id}`);
   if (el) el.classList.add('selected');
+  updateOrientationIndicator();
   clearPreview();
 }
 
 function rotateShip() {
   state.horizontal = !state.horizontal;
+  updateOrientationIndicator();
   if (state.hoverCell) showPreview(...state.hoverCell);
 }
 
 function handleKey(e) {
-  if (e.key === 'r' || e.key === 'R') rotateShip();
+  if ((e.key === 'r' || e.key === 'R') && !e.repeat) {
+    e.preventDefault();
+    rotateShip();
+  }
+}
+
+function handleShipPointerUp(e, shipId) {
+  if (e.pointerType !== 'touch') return;
+
+  const now = performance.now();
+  const isDoubleTap = lastShipTap.shipId === shipId && now - lastShipTap.at <= DOUBLE_TAP_MS;
+  lastShipTap = isDoubleTap ? { shipId: null, at: 0 } : { shipId, at: now };
+  if (!isDoubleTap) return;
+
+  e.preventDefault();
+  selectShip(shipId);
+  if (state.selectedShip?.id === shipId) rotateShip();
+}
+
+function updateOrientationIndicator() {
+  document.querySelectorAll('.ship-item').forEach(el => el.removeAttribute('data-orientation'));
+  if (!state.selectedShip) return;
+  const selected = document.getElementById(`ship-item-${state.selectedShip.id}`);
+  if (selected) selected.dataset.orientation = state.horizontal ? '↔' : '↕';
 }
 
 function onPlaceCellHover(r, c) {

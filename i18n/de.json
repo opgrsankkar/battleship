@@ -21,7 +21,7 @@
     "hard": "Schwer",
     "difficultyHint": "Einfach: Zufällige Schüsse | Mittel: Suchen & Zielen | Schwer: Wahrscheinlichkeitsbasiert",
     "placeShips": "Schiffe platzieren",
-    "placeShipsHint": "Wähle ein Schiff aus der Liste und klicke auf das Gitter. Nutze Drehen (R) zum Wenden. Platziere alle Schiffe und klicke auf Bereit!",
+    "placeShipsHint": "Wähle ein Schiff aus der Liste und klicke auf das Gitter. Drücke R oder tippe doppelt auf ein ausgewähltes Schiff, um es zu drehen. Platziere alle Schiffe und klicke auf Bereit!",
     "rotate": "Drehen (R)",
     "random": "Zufällig",
     "ready": "Bereit!",

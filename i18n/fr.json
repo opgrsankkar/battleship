@@ -21,7 +21,7 @@
     "hard": "Difficile",
     "difficultyHint": "Facile : tirs aléatoires | Moyen : traque et cible | Difficile : basé sur les probabilités",
     "placeShips": "Placez vos navires",
-    "placeShipsHint": "Sélectionnez un navire dans la liste, puis cliquez sur la grille pour le placer. Utilisez Rotation (R) pour changer l'orientation. Placez tous les navires, puis cliquez sur Prêt !",
+    "placeShipsHint": "Sélectionnez un navire dans la liste, puis cliquez sur la grille pour le placer. Appuyez sur R ou touchez deux fois un navire sélectionné pour le faire pivoter. Placez tous les navires, puis cliquez sur Prêt !",
     "rotate": "Rotation (R)",
     "random": "Aléatoire",
     "ready": "Prêt !",
